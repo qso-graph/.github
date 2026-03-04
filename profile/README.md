@@ -4,14 +4,27 @@ Open-source [Model Context Protocol](https://modelcontextprotocol.io) servers th
 
 Built on [adif-mcp](https://github.com/KI7MT/adif-mcp) for identity, credential management, and ADIF specification tools.
 
+## Security — Our #1 Priority
+
+**Your credentials never leave the OS keyring.** Every qso-graph server enforces 10 non-negotiable security guarantees:
+
+- Credentials stored in OS keyring only (macOS Keychain, Windows Credential Manager, Linux Secret Service) — never in config files, environment variables, or logs
+- Credentials never appear in MCP tool results, error messages, or debug output — enforced by architecture, not policy
+- No command injection surface — no `subprocess`, no `shell=True`, no `eval`
+- All external connections HTTPS only
+- Rate limiting on every API to prevent account bans
+- Independent security audit required before every PyPI release
+
+Full framework: [MCP-SECURITY-FRAMEWORK.md](https://github.com/IONIS-AI/ionis-devel/blob/main/planning/MCP-SECURITY-FRAMEWORK.md)
+
 ## Packages
 
 | Package | Service | Tools | Status |
 |:--------|:--------|:------|:-------|
 | [eqsl-mcp](https://github.com/qso-graph/eqsl-mcp) | [eQSL.cc](https://www.eqsl.cc/) | Inbox download, QSO verification, AG status, last upload | [PyPI](https://pypi.org/project/eqsl-mcp/) |
 | [qrz-mcp](https://github.com/qso-graph/qrz-mcp) | [QRZ.com](https://www.qrz.com/) | Callsign lookup, DXCC resolution, logbook queries | [PyPI](https://pypi.org/project/qrz-mcp/) |
-| [clublog-mcp](https://github.com/qso-graph/clublog-mcp) | [Club Log](https://clublog.org/) | Log search, DXCC status, most-wanted, OQRS | Planned |
-| [lotw-mcp](https://github.com/qso-graph/lotw-mcp) | [LoTW](https://lotw.arrl.org/) | QSO query, QSL status, DXCC credit | Planned |
+| [clublog-mcp](https://github.com/qso-graph/clublog-mcp) | [Club Log](https://clublog.org/) | DXCC resolution, log search, propagation activity, Most Wanted, expeditions | v0.1.0 |
+| [lotw-mcp](https://github.com/qso-graph/lotw-mcp) | [LoTW](https://lotw.arrl.org/) | Confirmations, QSO query, DXCC credits, user activity | v0.1.0 |
 | [hamqth-mcp](https://github.com/qso-graph/hamqth-mcp) | [HamQTH](https://www.hamqth.com/) | Callsign lookup (free QRZ alternative) | Planned |
 | [pota-mcp](https://github.com/qso-graph/pota-mcp) | [POTA](https://pota.app/) | Park lookup, activator/hunter stats, spots | Planned |
 | [sota-mcp](https://github.com/qso-graph/sota-mcp) | [SOTA](https://www.sota.org.uk/) | Summit lookup, activator stats, spots | Planned |
@@ -56,6 +69,10 @@ adif-mcp (foundation)          MCP Servers (qso-graph)
 | [adif-mcp](https://github.com/KI7MT/adif-mcp) | Foundation — ADIF spec tools, persona management, keyring credentials |
 | [ionis-mcp](https://github.com/IONIS-AI/ionis-mcp) | HF propagation analytics from 175M+ signatures (14B observations) |
 | [ionis-jupyter](https://github.com/IONIS-AI/ionis-jupyter) | Jupyter notebooks for propagation research |
+
+## Reporting Security Issues
+
+Do NOT open public GitHub issues for security vulnerabilities. Email: ki7mt@yahoo.com with subject `[SECURITY] qso-graph vulnerability report`.
 
 ## License
 
