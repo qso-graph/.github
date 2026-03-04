@@ -9,7 +9,7 @@ Built on [adif-mcp](https://github.com/KI7MT/adif-mcp) for identity, credential 
 | Package | Service | Tools | Status |
 |:--------|:--------|:------|:-------|
 | [eqsl-mcp](https://github.com/qso-graph/eqsl-mcp) | [eQSL.cc](https://www.eqsl.cc/) | Inbox download, QSO verification, AG status, last upload | [PyPI](https://pypi.org/project/eqsl-mcp/) |
-| [qrz-mcp](https://github.com/qso-graph/qrz-mcp) | [QRZ.com](https://www.qrz.com/) | Callsign lookup, DXCC resolution, logbook queries | v0.1.0 |
+| [qrz-mcp](https://github.com/qso-graph/qrz-mcp) | [QRZ.com](https://www.qrz.com/) | Callsign lookup, DXCC resolution, logbook queries | [PyPI](https://pypi.org/project/qrz-mcp/) |
 | [clublog-mcp](https://github.com/qso-graph/clublog-mcp) | [Club Log](https://clublog.org/) | Log search, DXCC status, most-wanted, OQRS | Planned |
 | [lotw-mcp](https://github.com/qso-graph/lotw-mcp) | [LoTW](https://lotw.arrl.org/) | QSO query, QSL status, DXCC credit | Planned |
 | [hamqth-mcp](https://github.com/qso-graph/hamqth-mcp) | [HamQTH](https://www.hamqth.com/) | Callsign lookup (free QRZ alternative) | Planned |
