@@ -1,6 +1,11 @@
 # QSO-Graph — MCP Servers for Amateur Radio
 
+[![Live Demo](https://img.shields.io/badge/demo-live-22c55e?style=flat-square&logo=vercel)](https://qso-graph-demo.vercel.app/)
+[![Docs](https://img.shields.io/badge/docs-qso--graph.io-3b82f6?style=flat-square)](https://qso-graph.io)
+
 Open-source [Model Context Protocol](https://modelcontextprotocol.io) servers that connect AI assistants to amateur radio services. Ask Claude, ChatGPT, Copilot, or Gemini about your QSOs, confirmations, and logbook data — no manual API wrangling required.
+
+**[View the live demo →](https://qso-graph-demo.vercel.app/)** · **[Documentation →](https://qso-graph.io)**
 
 Built on [adif-mcp](https://github.com/KI7MT/adif-mcp) for identity, credential management, and ADIF specification tools.
 
@@ -21,15 +26,15 @@ Full framework: [MCP-SECURITY-FRAMEWORK.md](https://github.com/IONIS-AI/ionis-de
 
 | Package | Service | Tools | Status |
 |:--------|:--------|:------|:-------|
-| [eqsl-mcp](https://github.com/qso-graph/eqsl-mcp) | [eQSL.cc](https://www.eqsl.cc/) | Inbox download, QSO verification, AG status, last upload | [PyPI](https://pypi.org/project/eqsl-mcp/) |
-| [qrz-mcp](https://github.com/qso-graph/qrz-mcp) | [QRZ.com](https://www.qrz.com/) | Callsign lookup, DXCC resolution, logbook queries | [PyPI](https://pypi.org/project/qrz-mcp/) |
-| [clublog-mcp](https://github.com/qso-graph/clublog-mcp) | [Club Log](https://clublog.org/) | DXCC resolution, log search, propagation activity, Most Wanted, expeditions | v0.1.0 |
-| [lotw-mcp](https://github.com/qso-graph/lotw-mcp) | [LoTW](https://lotw.arrl.org/) | Confirmations, QSO query, DXCC credits, user activity | v0.1.0 |
-| [hamqth-mcp](https://github.com/qso-graph/hamqth-mcp) | [HamQTH](https://www.hamqth.com/) | Callsign lookup (free QRZ alternative) | Planned |
-| [pota-mcp](https://github.com/qso-graph/pota-mcp) | [POTA](https://pota.app/) | Park lookup, activator/hunter stats, spots | Planned |
-| [sota-mcp](https://github.com/qso-graph/sota-mcp) | [SOTA](https://www.sota.org.uk/) | Summit lookup, activator stats, spots | Planned |
-| [solar-mcp](https://github.com/qso-graph/solar-mcp) | [NOAA SWPC](https://www.swpc.noaa.gov/) | Solar indices, space weather, DSCOVR, alerts | Planned |
-| [wspr-mcp](https://github.com/qso-graph/wspr-mcp) | [WSPR](https://www.wsprnet.org/) | Band openings, path analysis, solar correlation | Planned |
+| [eqsl-mcp](https://github.com/qso-graph/eqsl-mcp) | [eQSL.cc](https://www.eqsl.cc/) | Inbox download, QSO verification, AG status, last upload | [PyPI v0.1.1](https://pypi.org/project/eqsl-mcp/) |
+| [qrz-mcp](https://github.com/qso-graph/qrz-mcp) | [QRZ.com](https://www.qrz.com/) | Callsign lookup, DXCC resolution, logbook queries | [PyPI v0.1.1](https://pypi.org/project/qrz-mcp/) |
+| [clublog-mcp](https://github.com/qso-graph/clublog-mcp) | [Club Log](https://clublog.org/) | DXCC resolution, log search, propagation activity, Most Wanted, expeditions | [PyPI v0.1.1](https://pypi.org/project/clublog-mcp/) |
+| [lotw-mcp](https://github.com/qso-graph/lotw-mcp) | [LoTW](https://lotw.arrl.org/) | Confirmations, QSO query, DXCC credits, user activity | [PyPI v0.1.1](https://pypi.org/project/lotw-mcp/) |
+| [hamqth-mcp](https://github.com/qso-graph/hamqth-mcp) | [HamQTH](https://www.hamqth.com/) | Callsign lookup, DXCC, bio, activity | [PyPI v0.1.1](https://pypi.org/project/hamqth-mcp/) |
+| [pota-mcp](https://github.com/qso-graph/pota-mcp) | [POTA](https://pota.app/) | Live spots, park info, stats, schedules, location search | [PyPI v0.1.0](https://pypi.org/project/pota-mcp/) |
+| [sota-mcp](https://github.com/qso-graph/sota-mcp) | [SOTA](https://www.sota.org.uk/) | Spots, alerts, summit info, nearby search, activator stats | [PyPI v0.1.0](https://pypi.org/project/sota-mcp/) |
+| [solar-mcp](https://github.com/qso-graph/solar-mcp) | [NOAA SWPC](https://www.swpc.noaa.gov/) | SFI, Kp, solar wind, X-ray flux, band outlook, alerts | [PyPI v0.1.0](https://pypi.org/project/solar-mcp/) |
+| [wspr-mcp](https://github.com/qso-graph/wspr-mcp) | [WSPR](https://www.wsprnet.org/) | Beacon spots, band activity, propagation paths, TX power | [PyPI v0.1.0](https://pypi.org/project/wspr-mcp/) |
 
 ## Quick Start
 
