@@ -20,7 +20,7 @@ Built on [adif-mcp](https://github.com/KI7MT/adif-mcp) for identity, credential 
 - Rate limiting on every API to prevent account bans
 - Independent security audit required before every PyPI release
 
-Full framework: [MCP-SECURITY-FRAMEWORK.md](https://github.com/IONIS-AI/ionis-devel/blob/main/planning/MCP-SECURITY-FRAMEWORK.md)
+Full details: [Security](https://qso-graph.io/security/)
 
 ## Packages
 
