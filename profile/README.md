@@ -26,7 +26,7 @@ Full details: [Security](https://qso-graph.io/security/)
 
 | Package | Purpose | Tools | Status |
 |:--------|:--------|:------|:-------|
-| [adif-mcp](https://github.com/KI7MT/adif-mcp) | ADIF 3.1.6 spec engine, validation, persona management, keyring credentials | Parse, validate, search enumerations, list enumerations, distance, heading, version | [PyPI v0.7.0](https://pypi.org/project/adif-mcp/) |
+| [adif-mcp](https://github.com/qso-graph/adif-mcp) | ADIF 3.1.6 spec engine, validation, persona management, keyring credentials | Parse, validate, search enumerations, list enumerations, distance, heading, version | [PyPI v0.7.0](https://pypi.org/project/adif-mcp/) |
 
 ### Logbook Services (Authenticated)
 
