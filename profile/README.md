@@ -26,7 +26,7 @@ Full details: [Security](https://qso-graph.io/security/)
 
 | Package | Purpose | Tools | Status |
 |:--------|:--------|:------|:-------|
-| [adif-mcp](https://github.com/qso-graph/adif-mcp) | ADIF 3.1.6 spec engine, validation, persona management, keyring credentials | 8 tools: parse, validate, search/list enumerations, distance, heading, version | [PyPI v0.9.3](https://pypi.org/project/adif-mcp/) |
+| [adif-mcp](https://github.com/qso-graph/adif-mcp) | ADIF 3.1.6 spec engine, validation, persona management, keyring credentials | 8 tools: parse, validate, search/list enumerations, distance, heading, version | [PyPI v0.9.6](https://pypi.org/project/adif-mcp/) |
 
 ### Logbook Services (Authenticated)
 
@@ -34,7 +34,7 @@ Full details: [Security](https://qso-graph.io/security/)
 |:--------|:--------|:------|:-------|
 | [eqsl-mcp](https://github.com/qso-graph/eqsl-mcp) | [eQSL.cc](https://www.eqsl.cc/) | 4 tools: inbox download, QSO verification, AG status, last upload | [PyPI v0.2.0](https://pypi.org/project/eqsl-mcp/) |
 | [lotw-mcp](https://github.com/qso-graph/lotw-mcp) | [LoTW](https://lotw.arrl.org/) | 4 tools: confirmations, QSO query, DXCC credits, user activity | [PyPI v0.2.0](https://pypi.org/project/lotw-mcp/) |
-| [qrz-mcp](https://github.com/qso-graph/qrz-mcp) | [QRZ.com](https://www.qrz.com/) | 4 tools: callsign lookup, DXCC resolution, logbook status, logbook fetch | [PyPI v0.2.0](https://pypi.org/project/qrz-mcp/) |
+| [qrz-mcp](https://github.com/qso-graph/qrz-mcp) | [QRZ.com](https://www.qrz.com/) | 4 tools: callsign lookup, DXCC resolution, logbook status, logbook fetch | [PyPI v0.2.1](https://pypi.org/project/qrz-mcp/) |
 | [hamqth-mcp](https://github.com/qso-graph/hamqth-mcp) | [HamQTH](https://www.hamqth.com/) | 7 tools: lookup, DXCC, bio, activity, DX spots, RBN, verify QSO | [PyPI v0.2.0](https://pypi.org/project/hamqth-mcp/) |
 
 ### Public Services (No Auth Required)
