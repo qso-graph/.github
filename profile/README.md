@@ -9,7 +9,7 @@ Open-source [Model Context Protocol](https://modelcontextprotocol.io) servers th
 
 ## Security — Our #1 Priority
 
-**Your credentials never leave the OS keyring.** Every qso-graph server enforces 10 non-negotiable security guarantees:
+**Your credentials never leave the OS keyring.** Every qso-graph server enforces non-negotiable security guarantees:
 
 - Credentials stored in OS keyring only (macOS Keychain, Windows Credential Manager, Linux Secret Service) — never in config files, environment variables, or logs
 - Credentials never appear in MCP tool results, error messages, or debug output — enforced by architecture, not policy
@@ -24,65 +24,66 @@ Full details: [Security](https://qso-graph.io/security/)
 
 ### Foundation
 
-| Package | Purpose | Tools | Status |
-|:--------|:--------|:------|:-------|
-| [adif-mcp](https://github.com/qso-graph/adif-mcp) | ADIF 3.1.6 spec engine, validation, persona management, keyring credentials | 8 tools: parse, validate, search/list enumerations, distance, heading, version | [PyPI v0.9.6](https://pypi.org/project/adif-mcp/) |
+| Package | Purpose | Status |
+|:--------|:--------|:-------|
+| [adif-mcp](https://github.com/qso-graph/adif-mcp) | ADIF 3.1.6 spec parsing, validation, enumerations (8 tools) | [PyPI v0.9.6](https://pypi.org/project/adif-mcp/) |
+| [qso-graph-auth](https://github.com/qso-graph/qso-graph-auth) | Persona management, OS keyring credentials, `qso-auth` CLI | [PyPI v0.1.0](https://pypi.org/project/qso-graph-auth/) |
 
 ### Logbook Services (Authenticated)
 
 | Package | Service | Tools | Status |
 |:--------|:--------|:------|:-------|
-| [eqsl-mcp](https://github.com/qso-graph/eqsl-mcp) | [eQSL.cc](https://www.eqsl.cc/) | 4 tools: inbox download, QSO verification, AG status, last upload | [PyPI v0.2.0](https://pypi.org/project/eqsl-mcp/) |
-| [lotw-mcp](https://github.com/qso-graph/lotw-mcp) | [LoTW](https://lotw.arrl.org/) | 4 tools: confirmations, QSO query, DXCC credits, user activity | [PyPI v0.2.0](https://pypi.org/project/lotw-mcp/) |
-| [qrz-mcp](https://github.com/qso-graph/qrz-mcp) | [QRZ.com](https://www.qrz.com/) | 4 tools: callsign lookup, DXCC resolution, logbook status, logbook fetch | [PyPI v0.2.1](https://pypi.org/project/qrz-mcp/) |
-| [hamqth-mcp](https://github.com/qso-graph/hamqth-mcp) | [HamQTH](https://www.hamqth.com/) | 7 tools: lookup, DXCC, bio, activity, DX spots, RBN, verify QSO | [PyPI v0.2.0](https://pypi.org/project/hamqth-mcp/) |
+| [eqsl-mcp](https://github.com/qso-graph/eqsl-mcp) | [eQSL.cc](https://www.eqsl.cc/) | 5 tools: inbox, verify, AG status, download, last upload | [PyPI v0.2.2](https://pypi.org/project/eqsl-mcp/) |
+| [lotw-mcp](https://github.com/qso-graph/lotw-mcp) | [LoTW](https://lotw.arrl.org/) | 5 tools: confirmations, QSOs, DXCC credits, download, user activity | [PyPI v0.2.1](https://pypi.org/project/lotw-mcp/) |
+| [qrz-mcp](https://github.com/qso-graph/qrz-mcp) | [QRZ.com](https://www.qrz.com/) | 5 tools: lookup, DXCC, logbook status, download, logbook fetch | [PyPI v0.2.2](https://pypi.org/project/qrz-mcp/) |
+| [hamqth-mcp](https://github.com/qso-graph/hamqth-mcp) | [HamQTH](https://www.hamqth.com/) | 7 tools: lookup, DXCC, bio, activity, DX spots, RBN, verify QSO | [PyPI v0.2.2](https://pypi.org/project/hamqth-mcp/) |
 
 ### Public Services (No Auth Required)
 
 | Package | Service | Tools | Status |
 |:--------|:--------|:------|:-------|
-| [pota-mcp](https://github.com/qso-graph/pota-mcp) | [POTA](https://pota.app/) | 6 tools: live spots, park info, stats, schedules, location search, activator | [PyPI v0.1.1](https://pypi.org/project/pota-mcp/) |
-| [sota-mcp](https://github.com/qso-graph/sota-mcp) | [SOTA](https://www.sota.org.uk/) | 5 tools: spots, alerts, summit info, nearby search, activator stats | [PyPI v0.1.1](https://pypi.org/project/sota-mcp/) |
+| [pota-mcp](https://github.com/qso-graph/pota-mcp) | [POTA](https://pota.app/) | 6 tools: spots, park info, stats, schedules, location, activator | [PyPI v0.1.1](https://pypi.org/project/pota-mcp/) |
+| [sota-mcp](https://github.com/qso-graph/sota-mcp) | [SOTA](https://www.sota.org.uk/) | 4 tools: spots, alerts, summit info, nearby summits | [PyPI v0.1.4](https://pypi.org/project/sota-mcp/) |
 | [iota-mcp](https://github.com/qso-graph/iota-mcp) | [IOTA](https://www.iota-world.org/) | 6 tools: group lookup, island search, DXCC mapping, nearby, stats | [PyPI v0.1.0](https://pypi.org/project/iota-mcp/) |
-| [solar-mcp](https://github.com/qso-graph/solar-mcp) | [NOAA SWPC](https://www.swpc.noaa.gov/) | 6 tools: SFI, Kp, solar wind, X-ray flux, band outlook, alerts | [PyPI v0.1.1](https://pypi.org/project/solar-mcp/) |
-| [wspr-mcp](https://github.com/qso-graph/wspr-mcp) | [WSPR](https://www.wsprnet.org/) | 5 tools: beacon spots, band activity, propagation paths, TX power | [PyPI v0.1.1](https://pypi.org/project/wspr-mcp/) |
+| [solar-mcp](https://github.com/qso-graph/solar-mcp) | [NOAA SWPC](https://www.swpc.noaa.gov/) | 6 tools: SFI, Kp, solar wind, X-ray flux, band outlook, alerts | [PyPI v0.2.0](https://pypi.org/project/solar-mcp/) |
+| [wspr-mcp](https://github.com/qso-graph/wspr-mcp) | [WSPR](https://www.wsprnet.org/) | 8 tools: spots, band activity, top beacons/spotters, propagation, grid, SNR | [PyPI v0.2.0](https://pypi.org/project/wspr-mcp/) |
 
-### Desktop
+### Desktop & Meta
 
 | Package | Purpose | Status |
 |:--------|:--------|:-------|
+| [qso-graph-mcp](https://github.com/qso-graph/qso-graph-mcp) | Meta-package: `pip install qso-graph-mcp[full]` for all 11 servers | Pre-release |
 | [qso-graph-manager](https://github.com/qso-graph/qso-graph-manager) | Desktop GUI for managing personas and credentials (Wails/Go/Svelte) | Pre-release |
 
 ## Quick Start
 
 ```bash
-# Install a server
-pip install eqsl-mcp
+# Install a public server (no auth needed)
+pip install solar-mcp
 
-# Set up credentials (via adif-mcp)
-pip install adif-mcp
-adif-mcp persona create ki7mt --callsign KI7MT
-adif-mcp persona provider ki7mt eqsl --username KI7MT
-adif-mcp persona secret ki7mt eqsl
+# Or install everything
+pip install qso-graph-mcp[full]
 
-# Add to Claude Desktop config and restart
+# Set up credentials for authenticated servers
+pip install qso-graph-auth
+qso-auth persona add --name default --callsign YOUR_CALL --start 2020-01-01
+qso-auth provider enable default eqsl
+qso-auth creds set default eqsl --username YOUR_CALL --password YOUR_PASS
 ```
 
-Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code / GitHub Copilot, and Gemini CLI. See individual package READMEs for configuration.
+Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code / GitHub Copilot, Windsurf, Gemini CLI, Goose, and Codex CLI.
 
 ## Architecture
 
 ```
-adif-mcp (foundation)          MCP Servers (qso-graph)
- ├── PersonaManager       ──>   eqsl-mcp, qrz-mcp, lotw-mcp, hamqth-mcp
- ├── Keyring credentials        Each server = 1 pip install
- └── ADIF spec tools            Each server = 4-8 MCP tools
-```
+qso-graph-auth (identity)       MCP Servers (qso-graph)
+ ├── PersonaManager        ──>   eqsl-mcp, qrz-mcp, lotw-mcp, hamqth-mcp
+ ├── OS keyring credentials      Each server = 1 pip install
+ └── qso-auth CLI                Each server = 4-8 MCP tools
 
-- **adif-mcp** handles identity and credentials once — all servers share it
-- Each server is a standalone `pip install` with a single CLI entry point
-- Two public tools per server where possible (no auth needed to try it)
-- Python (FastMCP) now, Go single-binary ports planned for production
+adif-mcp (ADIF spec)            Public Servers
+ └── 8 spec tools          ──>   solar, pota, sota, iota, wspr (no auth)
+```
 
 ## Related Projects
 
