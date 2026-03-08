@@ -5,7 +5,31 @@
 
 Open-source [Model Context Protocol](https://modelcontextprotocol.io) servers that connect AI assistants to amateur radio services. Ask Claude, ChatGPT, Copilot, or Gemini about your QSOs, confirmations, and logbook data — no manual API wrangling required.
 
+**12 packages · 71 tools · one install command.**
+
 **[View the live demo →](https://qso-graph-demo.vercel.app/)** · **[Documentation →](https://qso-graph.io)**
+
+## Install
+
+```bash
+curl -sL https://qso-graph.io/install.sh | bash
+```
+
+Creates `~/.qso-graph/` with an isolated Python environment, installs the
+base MCP servers (6 servers, 38 tools), and adds them to your PATH. Works
+on Linux and macOS. No root required.
+
+After install, run `qso-graph-config` to manage servers, credentials,
+datasets, and MCP client configuration via an interactive TUI.
+
+**Advanced users** can install directly via pip:
+
+```bash
+pip install qso-graph-config                    # Base — 6 servers, 38 tools
+pip install "qso-graph-config[auth]"            # + 4 logbook servers (22 tools)
+pip install "qso-graph-config[ionis]"           # + ionis-mcp propagation (11 tools)
+pip install "qso-graph-config[full]"            # Everything — 12 packages, 71 tools
+```
 
 ## Security — Our #1 Priority
 
@@ -21,6 +45,12 @@ Open-source [Model Context Protocol](https://modelcontextprotocol.io) servers th
 Full details: [Security](https://qso-graph.io/security/)
 
 ## Packages
+
+### Installer
+
+| Package | Purpose | Status |
+|:--------|:--------|:-------|
+| [qso-graph-config](https://github.com/qso-graph/qso-graph-config) | Installer and manager — TUI, upgrades, config generation, dataset downloads | [PyPI v0.1.0](https://pypi.org/project/qso-graph-config/) |
 
 ### Foundation
 
@@ -48,26 +78,23 @@ Full details: [Security](https://qso-graph.io/security/)
 | [solar-mcp](https://github.com/qso-graph/solar-mcp) | [NOAA SWPC](https://www.swpc.noaa.gov/) | 6 tools: SFI, Kp, solar wind, X-ray flux, band outlook, alerts | [PyPI v0.2.0](https://pypi.org/project/solar-mcp/) |
 | [wspr-mcp](https://github.com/qso-graph/wspr-mcp) | [WSPR](https://www.wsprnet.org/) | 8 tools: spots, band activity, top beacons/spotters, propagation, grid, SNR | [PyPI v0.2.0](https://pypi.org/project/wspr-mcp/) |
 
-### Desktop & Meta
+### Desktop
 
 | Package | Purpose | Status |
 |:--------|:--------|:-------|
-| [qso-graph-mcp](https://github.com/qso-graph/qso-graph-mcp) | Meta-package: `pip install qso-graph-mcp[full]` for all 11 servers | Pre-release |
 | [qso-graph-manager](https://github.com/qso-graph/qso-graph-manager) | Desktop GUI for managing personas and credentials (Wails/Go/Svelte) | Pre-release |
 
 ## Quick Start
 
 ```bash
-# Install a public server (no auth needed)
+# One-line install (Linux / macOS)
+curl -sL https://qso-graph.io/install.sh | bash
+
+# Launch the config manager
+qso-graph-config
+
+# Or install a single server directly
 pip install solar-mcp
-
-# Or install everything
-pip install qso-graph-mcp[full]
-
-# Set up credentials for authenticated servers
-pip install qso-graph-auth
-qso-auth persona add --name default --callsign YOUR_CALL --start 2020-01-01
-qso-auth creds set default eqsl
 ```
 
 Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code / GitHub Copilot, Windsurf, Gemini CLI, Goose, and Codex CLI.
@@ -75,6 +102,12 @@ Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cur
 ## Architecture
 
 ```
+install.sh (bootstrap)          qso-graph-config (manager)
+ └── ~/.qso-graph/               ├── Install / upgrade servers
+      ├── venv/                   ├── Credential setup (qso-auth)
+      ├── bin/ (PATH)             ├── Dataset downloads (ionis-mcp)
+      └── etc/state.json          └── MCP client config generation
+
 qso-graph-auth (identity)       MCP Servers (qso-graph)
  ├── PersonaManager        ──>   eqsl-mcp, qrz-mcp, lotw-mcp, hamqth-mcp
  ├── OS keyring credentials      Each server = 1 pip install
