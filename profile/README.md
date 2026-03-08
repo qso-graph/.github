@@ -26,17 +26,17 @@ Full details: [Security](https://qso-graph.io/security/)
 
 | Package | Purpose | Status |
 |:--------|:--------|:-------|
-| [adif-mcp](https://github.com/qso-graph/adif-mcp) | ADIF 3.1.6 spec parsing, validation, enumerations (8 tools) | [PyPI v0.9.6](https://pypi.org/project/adif-mcp/) |
+| [adif-mcp](https://github.com/qso-graph/adif-mcp) | ADIF 3.1.6 spec parsing, validation, enumerations (8 tools) | [PyPI v1.0.0](https://pypi.org/project/adif-mcp/) |
 | [qso-graph-auth](https://github.com/qso-graph/qso-graph-auth) | Persona management, OS keyring credentials, `qso-auth` CLI | [PyPI v0.1.0](https://pypi.org/project/qso-graph-auth/) |
 
 ### Logbook Services (Authenticated)
 
 | Package | Service | Tools | Status |
 |:--------|:--------|:------|:-------|
-| [eqsl-mcp](https://github.com/qso-graph/eqsl-mcp) | [eQSL.cc](https://www.eqsl.cc/) | 5 tools: inbox, verify, AG status, download, last upload | [PyPI v0.2.2](https://pypi.org/project/eqsl-mcp/) |
-| [lotw-mcp](https://github.com/qso-graph/lotw-mcp) | [LoTW](https://lotw.arrl.org/) | 5 tools: confirmations, QSOs, DXCC credits, download, user activity | [PyPI v0.2.1](https://pypi.org/project/lotw-mcp/) |
-| [qrz-mcp](https://github.com/qso-graph/qrz-mcp) | [QRZ.com](https://www.qrz.com/) | 5 tools: lookup, DXCC, logbook status, download, logbook fetch | [PyPI v0.2.2](https://pypi.org/project/qrz-mcp/) |
-| [hamqth-mcp](https://github.com/qso-graph/hamqth-mcp) | [HamQTH](https://www.hamqth.com/) | 7 tools: lookup, DXCC, bio, activity, DX spots, RBN, verify QSO | [PyPI v0.2.2](https://pypi.org/project/hamqth-mcp/) |
+| [eqsl-mcp](https://github.com/qso-graph/eqsl-mcp) | [eQSL.cc](https://www.eqsl.cc/) | 5 tools: inbox, verify, AG status, download, last upload | [PyPI v0.3.0](https://pypi.org/project/eqsl-mcp/) |
+| [lotw-mcp](https://github.com/qso-graph/lotw-mcp) | [LoTW](https://lotw.arrl.org/) | 5 tools: confirmations, QSOs, DXCC credits, download, user activity | [PyPI v0.3.0](https://pypi.org/project/lotw-mcp/) |
+| [qrz-mcp](https://github.com/qso-graph/qrz-mcp) | [QRZ.com](https://www.qrz.com/) | 5 tools: lookup, DXCC, logbook status, download, logbook fetch | [PyPI v0.3.0](https://pypi.org/project/qrz-mcp/) |
+| [hamqth-mcp](https://github.com/qso-graph/hamqth-mcp) | [HamQTH](https://www.hamqth.com/) | 7 tools: lookup, DXCC, bio, activity, DX spots, RBN, verify QSO | [PyPI v0.3.0](https://pypi.org/project/hamqth-mcp/) |
 
 ### Public Services (No Auth Required)
 
@@ -67,8 +67,7 @@ pip install qso-graph-mcp[full]
 # Set up credentials for authenticated servers
 pip install qso-graph-auth
 qso-auth persona add --name default --callsign YOUR_CALL --start 2020-01-01
-qso-auth provider enable default eqsl
-qso-auth creds set default eqsl --username YOUR_CALL --password YOUR_PASS
+qso-auth creds set default eqsl
 ```
 
 Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code / GitHub Copilot, Windsurf, Gemini CLI, Goose, and Codex CLI.
