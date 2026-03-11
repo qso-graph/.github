@@ -78,6 +78,12 @@ Full details: [Security](https://qso-graph.io/security/)
 | [solar-mcp](https://github.com/qso-graph/solar-mcp) | [NOAA SWPC](https://www.swpc.noaa.gov/) | 6 tools: SFI, Kp, solar wind, X-ray flux, band outlook, alerts | [PyPI v0.2.0](https://pypi.org/project/solar-mcp/) |
 | [wspr-mcp](https://github.com/qso-graph/wspr-mcp) | [WSPR](https://www.wsprnet.org/) | 8 tools: spots, band activity, top beacons/spotters, propagation, grid, SNR | [PyPI v0.2.0](https://pypi.org/project/wspr-mcp/) |
 
+### Infrastructure
+
+| Package | Purpose | Status |
+|:--------|:--------|:-------|
+| [qsp-mcp](https://github.com/qso-graph/qsp-mcp) | QSP — relay MCP tools to any local LLM (llama.cpp, Ollama, vLLM, SGLang) | [PyPI v0.1.0](https://pypi.org/project/qsp-mcp/) |
+
 ### Desktop
 
 | Package | Purpose | Status |
@@ -97,7 +103,7 @@ qso-graph-config
 pip install solar-mcp
 ```
 
-Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code / GitHub Copilot, Windsurf, Gemini CLI, Goose, and Codex CLI.
+Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code / GitHub Copilot, Windsurf, Gemini CLI, Goose, and Codex CLI — or use [qsp-mcp](https://github.com/qso-graph/qsp-mcp) to relay tools to any local LLM.
 
 ## Architecture
 
@@ -115,6 +121,11 @@ qso-graph-auth (identity)       MCP Servers (qso-graph)
 
 adif-mcp (ADIF spec)            Public Servers
  └── 8 spec tools          ──>   solar, pota, sota, iota, wspr (no auth)
+
+qsp-mcp (tool relay)            Local LLM Inference
+ └── Stateless pipe        ──>   llama.cpp, Ollama, vLLM, SGLang
+     MCP tools → OpenAI           Any model with function calling
+     tools format                  Zero cloud dependency
 ```
 
 ## Related Projects
