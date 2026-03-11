@@ -5,7 +5,7 @@
 
 Open-source [Model Context Protocol](https://modelcontextprotocol.io) servers that connect AI assistants to amateur radio services. Ask Claude, ChatGPT, Copilot, or Gemini about your QSOs, confirmations, and logbook data — no manual API wrangling required.
 
-**12 packages · 71 tools · one install command.**
+**13 packages · 79 tools · one install command.**
 
 **[View the live demo →](https://qso-graph-demo.vercel.app/)** · **[Documentation →](https://qso-graph.io)**
 
@@ -77,6 +77,12 @@ Full details: [Security](https://qso-graph.io/security/)
 | [iota-mcp](https://github.com/qso-graph/iota-mcp) | [IOTA](https://www.iota-world.org/) | 6 tools: group lookup, island search, DXCC mapping, nearby, stats | [PyPI v0.1.0](https://pypi.org/project/iota-mcp/) |
 | [solar-mcp](https://github.com/qso-graph/solar-mcp) | [NOAA SWPC](https://www.swpc.noaa.gov/) | 6 tools: SFI, Kp, solar wind, X-ray flux, band outlook, alerts | [PyPI v0.2.0](https://pypi.org/project/solar-mcp/) |
 | [wspr-mcp](https://github.com/qso-graph/wspr-mcp) | [WSPR](https://www.wsprnet.org/) | 8 tools: spots, band activity, top beacons/spotters, propagation, grid, SNR | [PyPI v0.2.0](https://pypi.org/project/wspr-mcp/) |
+
+### Radio Logging
+
+| Package | Service | Tools | Status |
+|:--------|:--------|:------|:-------|
+| [n1mm-mcp](https://github.com/qso-graph/n1mm-mcp) | [N1MM Logger+](https://n1mm.hamdocs.com/) | 8 tools: station state, lookup, contacts, bandmap, performance, multipliers, clock, diagnostics | [PyPI v0.1.0](https://pypi.org/project/n1mm-mcp/) |
 
 ### Infrastructure
 
