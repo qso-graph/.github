@@ -1,7 +1,7 @@
 # QSO-Graph — MCP Servers for Amateur Radio
 
 [![Live Demo](https://img.shields.io/badge/demo-live-22c55e?style=flat-square&logo=vercel)](https://qso-graph-demo.vercel.app/)
-[![DXpedition Demo](https://img.shields.io/badge/DXpeditions-3Y0K_Bouvet-f59e0b?style=flat-square&logo=vercel)](https://github.com/qso-graph/dxpedition-demo)
+[![DXpedition Demo](https://img.shields.io/badge/DXpeditions-3Y0K_Bouvet-f59e0b?style=flat-square&logo=vercel)](https://dxpedition-demo.vercel.app/)
 [![Docs](https://img.shields.io/badge/docs-qso--graph.io-3b82f6?style=flat-square)](https://qso-graph.io)
 
 Open-source [Model Context Protocol](https://modelcontextprotocol.io) servers that connect AI assistants to amateur radio services. Ask Claude, ChatGPT, Copilot, or Gemini about your QSOs, confirmations, and logbook data — no manual API wrangling required.
@@ -140,7 +140,7 @@ qsp-mcp (tool relay)            Local LLM Inference
 | Demo | Description | Status |
 |:-----|:------------|:-------|
 | [qso-graph-demo](https://github.com/qso-graph/qso-graph-demo) | QSO logbook analysis showcase (Next.js / Vercel) | [Live Demo](https://qso-graph-demo.vercel.app/) |
-| [dxpedition-demo](https://github.com/qso-graph/dxpedition-demo) | DXpedition propagation analysis — 3Y0K Bouvet Island (Next.js / Vercel) | Deploying |
+| [dxpedition-demo](https://github.com/qso-graph/dxpedition-demo) | DXpedition propagation analysis — 3Y0K Bouvet Island (Next.js / Vercel) | [Live Demo](https://dxpedition-demo.vercel.app/) |
 
 ## Related Projects
 
