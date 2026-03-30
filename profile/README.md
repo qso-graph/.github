@@ -57,7 +57,7 @@ Full details: [Security](https://qso-graph.io/security/)
 
 | Package | Purpose | Status |
 |:--------|:--------|:-------|
-| [adif-mcp](https://github.com/qso-graph/adif-mcp) | ADIF 3.1.6 spec parsing, validation, enumerations (8 tools) | [PyPI v1.0.0](https://pypi.org/project/adif-mcp/) |
+| [adif-mcp](https://github.com/qso-graph/adif-mcp) | ADIF 3.1.6 spec parsing, validation, enumerations (8 tools) | [PyPI v1.0.5](https://pypi.org/project/adif-mcp/) |
 | [qso-graph-auth](https://github.com/qso-graph/qso-graph-auth) | Persona management, OS keyring credentials, `qso-auth` CLI | [PyPI v0.1.0](https://pypi.org/project/qso-graph-auth/) |
 
 ### Logbook Services (Authenticated)
