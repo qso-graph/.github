@@ -91,12 +91,6 @@ Full details: [Security](https://qso-graph.io/security/)
 |:--------|:--------|:-------|
 | [qsp-mcp](https://github.com/qso-graph/qsp-mcp) | QSP — relay MCP tools to any local LLM (llama.cpp, Ollama, vLLM, SGLang) | [PyPI v0.1.0](https://pypi.org/project/qsp-mcp/) |
 
-### Desktop
-
-| Package | Purpose | Status |
-|:--------|:--------|:-------|
-| [qso-graph-manager](https://github.com/qso-graph/qso-graph-manager) | Desktop GUI for managing personas and credentials (Wails/Go/Svelte) | Pre-release |
-
 ## Quick Start
 
 ```bash
