@@ -261,6 +261,98 @@ Add this to every repo's CHANGELOG when the registry-publish job lands:
 
 ---
 
+## uv: how every qso-graph repo is installed, run and developed
+
+We use [uv](https://docs.astral.sh/uv/), and we recommend it to users. Proposed by
+[@MicaelJarniac](https://github.com/MicaelJarniac) in
+[qrz-mcp#8](https://github.com/qso-graph/qrz-mcp/issues/8).
+
+### For users (README)
+
+**Install** — `uvx` first (runs without an install step, always the current release), `pip`
+second:
+
+```bash
+uvx <package>            # run it; nothing to install
+pip install <package>    # or install it into your own environment
+```
+
+**MCP client config** — `uvx`, so there's no PATH to get right:
+
+```json
+{
+  "mcpServers": {
+    "<short-name>": {
+      "command": "uvx",
+      "args": ["<package>"]
+    }
+  }
+}
+```
+
+(VS Code uses `"servers"` instead of `"mcpServers"`.) Add one line after the configs: *installed
+with pip? use `"command": "<package>"` instead.* Servers that need environment variables keep
+their `"env"` block.
+
+Command-line tools (`qso-auth`, `ionis-download`): `uv tool install <package>`, which puts the
+commands on PATH.
+
+### For development (README "Development" section)
+
+```bash
+git clone https://github.com/qso-graph/<repo>.git
+cd <repo>
+uv sync --group dev
+uv run pytest
+```
+
+### pyproject.toml
+
+Test tools are declared, not only installed by CI:
+
+```toml
+[dependency-groups]
+dev = ["pytest>=8"]
+```
+
+Add others only if the tests use them (`pytest-asyncio` only with `async` tests). **`uv.lock` is
+committed**, so CI and every developer resolve the same versions. The build backend stays
+**hatchling**, and `publish.yml` is unchanged.
+
+### ci.yml
+
+```yaml
+jobs:
+  test:
+    name: pytest (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+
+      - name: Install (locked)
+        run: uv sync --group dev --frozen
+
+      - name: Unit tests
+        run: uv run pytest tests --ignore=tests/test_security.py -v
+
+      - name: Security tests
+        run: uv run pytest tests/test_security.py -v
+```
+
+`--frozen` fails CI if `uv.lock` is out of date with `pyproject.toml`, so the lock can't drift.
+Repos that also test Windows or macOS keep their `os` matrix.
+
+---
+
 ## Rollout checklist (per repo)
 
 When applying this template to a new repo:
@@ -275,6 +367,8 @@ When applying this template to a new repo:
 - [ ] `README.md` has both PyPI and MCP Registry badges
 - [ ] **After the tag: the publish run is green through `verify`**. The release isn't done until it is.
 - [ ] `CHANGELOG.md` has the "MCP Registry sync" entry in the upcoming release
+- [ ] **uv**: `[dependency-groups] dev`, `uv.lock` committed, `ci.yml` on `setup-uv` with `uv sync --group dev --frozen`
+- [ ] README: `uvx` install and `uvx` client configs; Development section uses `uv sync` / `uv run pytest`
 - [ ] No other YAML changes; per-repo independence preserved
 
 ---
