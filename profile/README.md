@@ -23,7 +23,7 @@ on Linux and macOS. No root required.
 After install, run `qso-graph-config` to manage servers, credentials,
 datasets, and MCP client configuration via an interactive TUI.
 
-**Advanced users** can install directly via pip:
+**Advanced users** can run any server directly with [uv](https://docs.astral.sh/uv/), nothing to install: `uvx solar-mcp`, and `"command": "uvx", "args": ["solar-mcp"]` in your MCP client. Or install the bundles with pip:
 
 ```bash
 pip install qso-graph-config                    # Base servers
@@ -101,8 +101,8 @@ curl -sL https://qso-graph.io/install.sh | bash
 # Launch the config manager
 qso-graph-config
 
-# Or install a single server directly
-pip install solar-mcp
+# Or run a single server directly with uv
+uvx solar-mcp
 ```
 
 Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code / GitHub Copilot, Windsurf, Gemini CLI, Goose, and Codex CLI — or use [qsp-client](https://github.com/qso-graph/qsp-client) to relay tools to any local LLM.
@@ -118,7 +118,7 @@ install.sh (bootstrap)          qso-graph-config (manager)
 
 qso-graph-auth (identity)       MCP Servers (qso-graph)
  ├── PersonaManager        ──>   eqsl-mcp, qrz-mcp, lotw-mcp, hamqth-mcp
- ├── OS keyring credentials      Each server = 1 pip install
+ ├── OS keyring credentials      Each server = 1 uvx       
  └── qso-auth CLI                Each server = 4-8 MCP tools
 
 adif-mcp (ADIF spec)            Public Servers
