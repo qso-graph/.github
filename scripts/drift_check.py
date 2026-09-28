@@ -7,7 +7,6 @@ compares, for every repo with a server.json:
 - the latest release tag on GitHub
 - PyPI
 - the Official MCP Registry
-- the Homebrew tap (qso-graph/homebrew-mcp)
 
 and reports any server where they disagree. Standard library only.
 
@@ -29,7 +28,8 @@ import urllib.parse
 import urllib.request
 
 ORG = "qso-graph"
-TAP = "homebrew-mcp"
+# *-mcp repos that aren't servers (the retired Homebrew tap, until it's archived).
+NOT_SERVERS = {"homebrew-mcp"}
 REGISTRY = "https://registry.modelcontextprotocol.io/v0/servers"
 UA = "qso-graph-drift-check (+https://github.com/qso-graph/.github)"
 DRIFT = 10  # distinct from 1, which is what a crash exits with
@@ -81,7 +81,7 @@ def mcp_repos() -> tuple[list[str], list[str]]:
         repos += [r["name"] for r in batch if not r["archived"] and not r["private"]]
         page += 1
     with_sj = sorted(r for r in repos if get_json(f"https://api.github.com/repos/{ORG}/{r}/contents/server.json", token=True))
-    missing = sorted(r for r in repos if r.endswith("-mcp") and r != TAP and r not in with_sj)
+    missing = sorted(r for r in repos if r.endswith("-mcp") and r not in NOT_SERVERS and r not in with_sj)
     return with_sj, missing
 
 
@@ -110,14 +110,6 @@ def registry(name: str) -> str | None:
     return None
 
 
-def homebrew(package: str) -> str | None:
-    body = get(f"https://raw.githubusercontent.com/{ORG}/{TAP}/main/Formula/{package}.rb")
-    if body is None:
-        return None
-    m = re.search(r'^\s*url\s+"[^"]*?-(\d+\.\d+\.\d+)\.tar\.gz"', body.decode(), re.MULTILINE)
-    return m.group(1) if m else "unreadable"
-
-
 def main() -> int:
     rows, drifted = [], []
     with_sj, missing = mcp_repos()
@@ -128,7 +120,6 @@ def main() -> int:
             "tag": lambda: latest_tag(repo),
             "PyPI": lambda: pypi(package),
             "Registry": lambda: registry(sj["name"]),
-            "Homebrew": lambda: homebrew(package),
         }
         found = {}
         for where, lookup in lookups.items():
@@ -143,13 +134,13 @@ def main() -> int:
         if bad:
             drifted.append(repo)
 
-    print("| Server | tag | PyPI | Registry | Homebrew | |")
-    print("|---|---|---|---|---|---|")
+    print("| Server | tag | PyPI | Registry | |")
+    print("|---|---|---|---|---|")
     for repo, found, bad in rows:
         cells = [f"**{v or 'none'}**" if where in bad else (v or "none") for where, v in found.items()]
         print(f"| {repo} | " + " | ".join(cells) + f" | {'drift: ' + ', '.join(bad) if bad else 'ok'} |")
     for repo in missing:
-        print(f"| {repo} | | | | | **no server.json** |")
+        print(f"| {repo} | | | | **no server.json** |")
         drifted.append(repo)
     print()
     if drifted:

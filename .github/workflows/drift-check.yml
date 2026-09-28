@@ -1,8 +1,8 @@
 name: Publishing drift check
 
 # A release is done only when it's published everywhere (TEMPLATES.md).
-# Weekly, compare every qso-graph MCP's latest tag, PyPI, the Official MCP
-# Registry and the Homebrew tap. Anything out of step opens (or updates) one
+# Weekly, compare every qso-graph MCP's latest tag, PyPI and the Official MCP
+# Registry. Anything out of step opens (or updates) one
 # "Publishing drift" issue; when everything agrees again, the issue closes.
 
 on:
