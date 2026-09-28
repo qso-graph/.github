@@ -1,0 +1,69 @@
+name: Publishing drift check
+
+# A release is done only when it's published everywhere (TEMPLATES.md).
+# Weekly, compare every qso-graph MCP's latest tag, PyPI, the Official MCP
+# Registry and the Homebrew tap. Anything out of step opens (or updates) one
+# "Publishing drift" issue; when everything agrees again, the issue closes.
+
+on:
+  schedule:
+    - cron: "0 14 * * 1"  # Mondays 14:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  drift:
+    name: Compare every publishing surface
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          python scripts/drift_check.py > report.md
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+          cat report.md
+
+      - name: Open or update the drift issue
+        if: steps.check.outputs.status == '10'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Publishing drift"
+          BODY="$(printf 'The weekly check found servers not published everywhere (run %s).\n\n' "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"; cat report.md)"
+          NUM="$(gh issue list --state open --search "\"$TITLE\" in:title" --json number,title -q ".[] | select(.title == \"$TITLE\") | .number" | head -1)"
+          if [ -n "$NUM" ]; then
+            gh issue edit "$NUM" --body "$BODY"
+            gh issue comment "$NUM" --body "Still drifting as of $(date -u +%F)."
+          else
+            gh issue create --title "$TITLE" --body "$BODY"
+          fi
+
+      - name: Close the drift issue when everything agrees
+        if: steps.check.outputs.status == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Publishing drift"
+          NUM="$(gh issue list --state open --search "\"$TITLE\" in:title" --json number,title -q ".[] | select(.title == \"$TITLE\") | .number" | head -1)"
+          if [ -n "$NUM" ]; then
+            gh issue close "$NUM" --comment "Every server is published everywhere again ($(date -u +%F))."
+          fi
+
+      - name: Fail on a crash
+        if: steps.check.outputs.status != '0' && steps.check.outputs.status != '10'
+        run: |
+          echo "The drift check itself failed (exit ${{ steps.check.outputs.status }})"
+          exit 1
