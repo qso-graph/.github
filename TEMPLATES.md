@@ -125,12 +125,64 @@ existing `publish` job:
           mv /tmp/server.json server.json
           cat server.json
 
+      # The Registry checks PyPI itself and refuses a version PyPI isn't
+      # serving yet, which can lag the upload by a minute or more.
+      - name: Wait until PyPI serves this version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PACKAGE="$(jq -r '.packages[0].identifier' server.json)"
+          for i in $(seq 1 40); do
+            if curl -fsS "https://pypi.org/pypi/${PACKAGE}/${TAG_VERSION}/json" > /dev/null; then
+              echo "PyPI serves ${PACKAGE} ${TAG_VERSION}"
+              exit 0
+            fi
+            echo "attempt ${i}: PyPI doesn't serve ${PACKAGE} ${TAG_VERSION} yet"
+            sleep 15
+          done
+          echo "FAIL: PyPI never served ${PACKAGE} ${TAG_VERSION}"
+          exit 1
+
       - name: Authenticate to MCP Registry (GitHub OIDC)
         run: ./mcp-publisher login github-oidc
 
+      # Retries ride out the Registry's own transient failures. Before each
+      # retry, check whether an earlier attempt landed despite the error.
       - name: Publish to MCP Registry
-        run: ./mcp-publisher publish
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          NAME="$(jq -r '.name' server.json)"
+          REGISTRY="https://registry.modelcontextprotocol.io/v0/servers?search=${NAME}&version=latest"
+          for i in 1 2 3 4 5; do
+            if ./mcp-publisher publish; then
+              exit 0
+            fi
+            echo "attempt ${i} failed; retrying in $((i * 30)) s"
+            sleep $((i * 30))
+            REG="$(curl -fsS "$REGISTRY" | jq -r --arg n "$NAME" '[.servers[] | select(.server.name == $n) | .server.version][0] // empty' || true)"
+            if [ "$REG" = "$TAG_VERSION" ]; then
+              echo "The Registry already has ${NAME} ${TAG_VERSION}; an earlier attempt landed"
+              exit 0
+            fi
+          done
+          echo "FAIL: the MCP Registry refused the publish 5 times"
+          exit 1
 ```
+
+### Why wait and retry
+
+The first run of this job (netlogger-mcp v0.1.1, 2026-09-28) failed
+twice, and both failures needed a manual re-run:
+
+1. **PyPI lag.** The Registry answered "version '0.1.1' was not found
+   (404)" because it checks PyPI itself, seconds after the upload. The
+   wait step closes that.
+2. **Registry outage.** On the re-run, the Registry's own database
+   refused connections. The retries ride that out.
+
+Before each retry the job checks whether the Registry already has the
+version, in case an attempt landed but its reply was lost; retrying that
+would only fail on "already exists". Either way, the `verify` job still
+decides whether the release is done.
 
 ### Requirements per repo
 
