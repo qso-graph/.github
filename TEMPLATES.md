@@ -1,6 +1,6 @@
 # qso-graph Workflow Templates
 
-Canonical snippets that the 13 qso-graph MCP repos copy into their own
+Canonical snippets that every qso-graph MCP repo copies into its own
 `.github/workflows/*.yml` files. Each repo holds an independent copy
 (per-repo isolation; see Patton's review note 2026-05-16 on the
 version-drift architecture). When a template changes, every copy is
@@ -8,6 +8,78 @@ updated explicitly by a PR per repo.
 
 This file is **the** source of truth. If you change a workflow in a
 single repo, update this file first and propagate.
+
+---
+
+## A release is done when it's published everywhere
+
+**A release is complete only when PyPI and the Official MCP Registry
+both serve the new version** (Judge, 2026-09-28). A PyPI release alone is
+half a release.
+
+`publish.yml` enforces that, in this order:
+
+1. **Security gates**, including **the tag must equal `pyproject.toml`'s
+   version**. PyPI publishes pyproject's version and the Registry
+   publishes the tag's; a mismatch would release two different numbers.
+2. **`publish`**: PyPI, by trusted publishing (OIDC).
+3. **`registry-publish`**: the MCP Registry, by GitHub OIDC.
+4. **`verify`**: poll PyPI and the Registry until both report the tagged
+   version. **If either doesn't within 10 minutes, the run fails.**
+
+**A green run means published everywhere. A red run means the release
+isn't done**, whichever step went red. Fix it and finish it; don't leave
+it for the next release.
+
+Why this exists: the Registry was never checked. On 2026-09-28 every
+qso-graph server in it was behind PyPI (solar-mcp: 0.2.1 on PyPI, 0.1.1 in
+the Registry since March), and no run had failed.
+
+### Tag gate (first step of the `security` job)
+
+```yaml
+      # PyPI publishes pyproject's version; the Registry publishes the tag's.
+      # They must be the same, or the two would disagree about what was released.
+      - name: Tag matches pyproject.toml version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PKG_VERSION="$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)"
+          echo "tag=${TAG_VERSION} pyproject=${PKG_VERSION}"
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "FAIL: tag v${TAG_VERSION} does not match pyproject.toml version ${PKG_VERSION}"
+            exit 1
+          fi
+```
+
+### Verify job (last, after `registry-publish`)
+
+```yaml
+  verify:
+    name: Verify PyPI and MCP Registry
+    needs: registry-publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: PyPI and Registry serve the tagged version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PACKAGE="$(jq -r '.packages[0].identifier' server.json)"
+          NAME="$(jq -r '.name' server.json)"
+          REGISTRY="https://registry.modelcontextprotocol.io/v0/servers?search=${NAME}&version=latest"
+          for i in $(seq 1 40); do
+            PYPI="$(curl -fsS "https://pypi.org/pypi/${PACKAGE}/json" | jq -r '.info.version' || true)"
+            REG="$(curl -fsS "$REGISTRY" | jq -r --arg n "$NAME" '[.servers[] | select(.server.name == $n) | .server.version][0] // empty' || true)"
+            echo "attempt ${i}: PyPI=${PYPI:-none} Registry=${REG:-none} want=${TAG_VERSION}"
+            if [ "$PYPI" = "$TAG_VERSION" ] && [ "$REG" = "$TAG_VERSION" ]; then
+              echo "Published everywhere: ${PACKAGE} ${TAG_VERSION} on PyPI and ${NAME} ${TAG_VERSION} in the MCP Registry"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "FAIL: release incomplete. PyPI=${PYPI:-none} Registry=${REG:-none}, expected ${TAG_VERSION}"
+          exit 1
+```
 
 ---
 
@@ -105,11 +177,14 @@ that reads the `version` field from the first matching Registry entry.
 
 ### Honest framing
 
-This rollout uses **forward-only sync** (per Patton 2026-05-16 review):
-existing Registry entries stay stale until each server's next real
-release naturally catches them up. The badge difference is the visible
-signal that staleness exists. Don't tag content-free releases just to
-sync — that pollutes version history.
+The 2026-05-16 rollout used **forward-only sync** (per Patton's review):
+Registry entries were left stale until each server's next real release.
+That left every server behind for months, with nothing failing
+(2026-09-28). **Superseded (Judge, 2026-09-28):** every MCP is brought up
+to date in one sweep, each release carrying the real changes of the sweep
+(README layout, `server.json`, the release gates), and from then on the
+`verify` job keeps PyPI and the Registry in step. The badges stay as a
+visible check.
 
 ---
 
@@ -127,13 +202,9 @@ Add this to every repo's CHANGELOG when the registry-publish job lands:
 - **Registry version badge** in README — PyPI and Registry versions
   are visible side-by-side so any drift between publishing surfaces
   is immediately apparent.
-
-### Known drift
-
-Earlier releases of this server (before this version) may show as
-**stale** in the Official MCP Registry. The Registry catches up on
-the next real release; we don't tag content-free releases purely for
-hygiene.
+- **Release gates** — the tag must match `pyproject.toml`, and a
+  `verify` job fails the release unless PyPI and the MCP Registry
+  both serve the new version.
 ```
 
 ---
@@ -147,7 +218,10 @@ When applying this template to a new repo:
 - [ ] `server.json` `packages[0].registryType` is `pypi`
 - [ ] `server.json` `packages[0].identifier` matches the PyPI name
 - [ ] `.github/workflows/publish.yml` has the `registry-publish` job appended
+- [ ] `publish.yml` has the **tag gate** (first step of `security`) and the **`verify` job** (after `registry-publish`)
+- [ ] `server.json` validates: `mcp-publisher validate`
 - [ ] `README.md` has both PyPI and MCP Registry badges
+- [ ] **After the tag: the publish run is green through `verify`**. The release isn't done until it is.
 - [ ] `CHANGELOG.md` has the "MCP Registry sync" entry in the upcoming release
 - [ ] No other YAML changes; per-repo independence preserved
 
