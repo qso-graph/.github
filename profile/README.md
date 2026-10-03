@@ -4,25 +4,43 @@
 [![DXpedition Demo](https://img.shields.io/badge/DXpeditions-3Y0K_Bouvet-f59e0b?style=flat-square&logo=vercel)](https://dxpedition-demo.vercel.app/)
 [![Docs](https://img.shields.io/badge/docs-qso--graph.io-3b82f6?style=flat-square)](https://qso-graph.io)
 
-A family of open-source tools for amateur radio: separate applications and services that each do one job well, and work together through shared, published contracts rather than shared code. **[ADIF](https://adif.org/) is the anchor:** everything here follows the ADIF specification, and extends it only where ADIF leaves room, never in conflict with it.
+Open-source software for amateur radio: applications, services and AI integrations that each do one job well and work together. Built in the open, under the GPL, for individual operators and for clubs, small and large alike.
 
 **[View the live demo →](https://qso-graph-demo.vercel.app/)** · **[Documentation →](https://qso-graph.io)**
 
-## Products
+## Today
+
+- **[MCP servers](#mcp-servers)** that connect AI assistants to the services hams use every day: QRZ, LoTW, eQSL, HamQTH, POTA, SOTA, IOTA, NOAA space weather, WSPR, NetLogger, N1MM Logger+, and the ADIF specification itself. Published on PyPI, installed with one command.
+- **[Tools](#packages)** that look after them: an installer and manager, and credential handling that keeps your passwords in your operating system's keyring.
+- **[Live demos](#demos)** of what that makes possible: logbook analysis, and DXpedition propagation planning.
+
+## Where we're heading
+
+From individual integrations to a family of products built the same way.
+
+**A family of products:**
 
 | Product | What it is | Status |
 |:--------|:-----------|:-------|
 | **QSO Graph Logger** | A native desktop logger for nets and contacts (Qt 6 / C++), with signed releases and safe updates | In development |
 | **QSO Graph SDK** | The build kit for QSO Graph Logger: one command to a pinned build environment, per platform | In development |
-| **qso-graph-adif** | ADIF as a service: the specification's fields, enumerations and data types by version, validation and lookups, as an API and web interface | Planned |
-| **qso-graph-core** | Club management for clubs without their own: members, awards, net history | Planned |
+| **qso-graph-adif** | ADIF as a service: the specification's fields, enumerations and data types by version, validation and lookups, as an API and a web interface | Planned |
+| **qso-graph-core** | Club management for clubs that have none of their own: members, awards, net history | Planned |
 | **qso-graph-atlas** | HF propagation data and analysis | Planned |
 
-Products are linked here as each becomes public. The services are built to run anywhere, including a club's own server.
+Products are linked here as each becomes public.
+
+**Built the same way, so any club can run them.** Every service is a library at heart, with thin layers over it: an API for applications, an MCP server for AI assistants, and a web interface where people need one. Each ships as container images that a club can run on its own server or a member's PC; desktop applications like the logger work on their own and connect to a club's services when there are some.
+
+**How they fit together:**
+
+- **[ADIF](https://adif.org/) is the anchor.** Everything here follows the ADIF specification, the format LoTW, eQSL, QRZ and every major logger share. Extensions only add to it, never contradict it.
+- **Shared contracts, not shared code.** Products talk through published APIs and the same reference data (ADIF, DXCC), and are tested against the same recorded service responses, so a Python MCP server and a C++ application agree on what a service means.
+- **For the users, by the users.** What a product means for clubs (award rules, what a net and a check-in are) is set by its published specification, with clubs, small and large, having an equal voice.
 
 ## MCP Servers
 
-Open-source [Model Context Protocol](https://modelcontextprotocol.io) servers that connect AI assistants to amateur radio services. Ask Claude, ChatGPT, Copilot, or Gemini about your QSOs, confirmations, and logbook data — no manual API wrangling required.
+The integration layer, available now. Open-source [Model Context Protocol](https://modelcontextprotocol.io) servers that connect AI assistants to amateur radio services. Ask Claude, ChatGPT, Copilot, or Gemini about your QSOs, confirmations, and logbook data — no manual API wrangling required.
 
 **One install command.** Every server, its tools and its current version: [qso-graph.io](https://qso-graph.io).
 
