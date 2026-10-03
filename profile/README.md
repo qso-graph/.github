@@ -4,7 +4,9 @@
 [![DXpedition Demo](https://img.shields.io/badge/DXpeditions-3Y0K_Bouvet-f59e0b?style=flat-square&logo=vercel)](https://dxpedition-demo.vercel.app/)
 [![Docs](https://img.shields.io/badge/docs-qso--graph.io-3b82f6?style=flat-square)](https://qso-graph.io)
 
-Open-source software for amateur radio: applications, services and AI integrations that each do one job well and work together. Built in the open, under the GPL, for individual operators and for clubs, small and large alike.
+**Open amateur radio software, built to work together.**
+
+QSO Graph is a suite of open amateur radio tools: a net logger, a club service, propagation analytics, and the libraries and AI integrations behind them. They share one data model, publish their interfaces, and are built so that any of them can be used alone. Free software under the GPL, for individual operators and for clubs, small and large.
 
 **[View the live demo →](https://qso-graph-demo.vercel.app/)** · **[Documentation →](https://qso-graph.io)**
 
@@ -16,27 +18,32 @@ Open-source software for amateur radio: applications, services and AI integratio
 
 ## Where we're heading
 
-From individual integrations to a family of products built the same way.
-
-**A family of products:**
-
 | Product | What it is | Status |
 |:--------|:-----------|:-------|
-| **QSO Graph Logger** | A native desktop logger for nets and contacts (Qt 6 / C++), with signed releases and safe updates | In development |
-| **QSO Graph SDK** | The build kit for QSO Graph Logger: one command to a pinned build environment, per platform | In development |
-| **qso-graph-adif** | ADIF as a service: the specification's fields, enumerations and data types by version, validation and lookups, as an API and a web interface | Planned |
-| **qso-graph-core** | Club management for clubs that have none of their own: members, awards, net history | Planned |
+| **QSO Graph Logger** (QGLogger) | A contest logger for nets: native desktop (Qt 6 / C++), with releases signed by more than one person and updates checked before they install | In development |
+| **QSO Graph SDK** (QGSDK) | The build kit for QGLogger: one command to a pinned build environment, per platform, so anyone can build it | In development |
+| **qso-graph-adif** | The ADIF specification as a service: fields, enumerations and data types by version, validation and lookups, through an API and a web interface | Planned |
+| **qso-graph-core** | Club services for clubs that have none of their own: members, awards, net history | Planned |
 | **qso-graph-atlas** | HF propagation data and analysis | Planned |
 
 Products are linked here as each becomes public.
 
-**Built the same way, so any club can run them.** Every service is a library at heart, with thin layers over it: an API for applications, an MCP server for AI assistants, and a web interface where people need one. Each ships as container images that a club can run on its own server or a member's PC; desktop applications like the logger work on their own and connect to a club's services when there are some.
+**In order:**
 
-**How they fit together:**
+1. **Now: one product, properly.** QGLogger runs nets, and QGSDK proves anyone can build it.
+2. **Next: the clubs with nothing.** qso-graph-core, for the many clubs and nets that have no software or server of their own.
+3. **Then: publish the seams.** The interfaces between the pieces become published specifications that anyone can implement, including software that isn't ours.
+4. **Eventually: governance that isn't us.** Clubs, small and large with an equal voice, steering the parts that affect them, through the specifications.
+
+Underneath all of it, continuously: the data. ADIF as the base, propagation as the research edge.
+
+**How the pieces fit:**
 
 - **[ADIF](https://adif.org/) is the anchor.** Everything here follows the ADIF specification, the format LoTW, eQSL, QRZ and every major logger share. Extensions only add to it, never contradict it.
-- **Shared contracts, not shared code.** Products talk through published APIs and the same reference data (ADIF, DXCC), and are tested against the same recorded service responses, so a Python MCP server and a C++ application agree on what a service means.
-- **For the users, by the users.** What a product means for clubs (award rules, what a net and a check-in are) is set by its published specification, with clubs, small and large, having an equal voice.
+- **Shared contracts, not shared code.** The pieces talk through published APIs and the same reference data (ADIF, DXCC), and are tested against the same recorded service responses, so a Python MCP server and a C++ application agree on what a service means.
+- **Each piece stands alone.** Every service is a library with thin layers over it: an API for applications, an MCP server for AI assistants, a web interface where people need one. Each ships as container images a club can run on its own server or a member's PC; desktop applications work on their own and connect to a club's services when there are some.
+
+**What we don't do:** general-purpose logging, and anything that replaces LoTW, eQSL or QRZ. QSO Graph records, queries and predicts contacts, and connects to those services rather than standing in for them.
 
 ## MCP Servers
 
