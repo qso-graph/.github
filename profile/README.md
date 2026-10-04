@@ -12,8 +12,8 @@ QSO Graph is a suite of open amateur radio tools: a net logger, a club service, 
 
 ## Today
 
-- **[MCP servers](#mcp-servers)** that connect AI assistants to the services hams use every day: QRZ, LoTW, eQSL, HamQTH, POTA, SOTA, IOTA, NOAA space weather, WSPR, NetLogger, N1MM Logger+, and the ADIF specification itself. Published on PyPI, installed with one command.
-- **[Tools](#packages)** that look after them: an installer and manager, and credential handling that keeps your passwords in your operating system's keyring.
+- **[MCP servers](#mcp-servers)** that connect AI assistants to the services hams use every day: QRZ, LoTW, eQSL, HamQTH, POTA, SOTA, IOTA, NOAA space weather, WSPR, NetLogger, N1MM Logger+, and the ADIF specification itself. Published on PyPI; each one runs with a single `uvx` command, nothing to install.
+- **[Tools](#packages)** that look after them: credential handling that keeps your passwords in your operating system's keyring, and a relay that gives local LLMs the same tools.
 - **[Live demos](#demos)** of what that makes possible: logbook analysis, and DXpedition propagation planning.
 
 ## Where we're heading
@@ -49,29 +49,24 @@ Underneath all of it, continuously: the data. ADIF as the base, propagation as t
 
 The integration layer, available now. Open-source [Model Context Protocol](https://modelcontextprotocol.io) servers that connect AI assistants to amateur radio services. Ask Claude, ChatGPT, Copilot, or Gemini about your QSOs, confirmations, and logbook data — no manual API wrangling required.
 
-**One install command.** Every server, its tools and its current version: [qso-graph.io](https://qso-graph.io).
+**Nothing to install per server.** Every server, its tools and its current version: [qso-graph.io](https://qso-graph.io).
 
 ### Install
 
-```bash
-curl -sL https://qso-graph.io/install.sh | bash
-```
-
-Creates `~/.qso-graph/` with an isolated Python environment, installs the
-base MCP servers, and adds them to your PATH. Works
-on Linux and macOS. No root required.
-
-After install, run `qso-graph-config` to manage servers, credentials,
-datasets, and MCP client configuration via an interactive TUI.
-
-**Advanced users** can run any server directly with [uv](https://docs.astral.sh/uv/), nothing to install: `uvx solar-mcp`, and `"command": "uvx", "args": ["solar-mcp"]` in your MCP client. Or install the bundles with pip:
+Install [uv](https://docs.astral.sh/uv/) once:
 
 ```bash
-pip install qso-graph-config                    # Base servers
-pip install "qso-graph-config[auth]"            # + 4 logbook servers
-pip install "qso-graph-config[ionis]"           # + ionis-mcp propagation
-pip install "qso-graph-config[full]"            # Everything
+curl -LsSf https://astral.sh/uv/install.sh | sh                  # Linux / macOS
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"      # Windows
 ```
+
+Then your MCP client runs each server with `uvx`, always the current release:
+
+```json
+"command": "uvx", "args": ["solar-mcp"]
+```
+
+Command-line tools install with `uv tool install`: `qso-graph-auth` (credentials, the `qso-auth` command) and `qsp-client` (the local-LLM relay). Client configs for Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code and Gemini CLI: [Getting Started](https://qso-graph.io/getting-started/).
 
 ### Security — Our #1 Priority
 
@@ -87,12 +82,6 @@ pip install "qso-graph-config[full]"            # Everything
 Full details: [Security](https://qso-graph.io/security/)
 
 ### Packages
-
-#### Installer
-
-| Package | Purpose | Status |
-|:--------|:--------|:-------|
-| [qso-graph-config](https://github.com/qso-graph/qso-graph-config) | Installer and manager — TUI, upgrades, config generation, dataset downloads | [![PyPI](https://img.shields.io/pypi/v/qso-graph-config?label=PyPI&color=blue)](https://pypi.org/project/qso-graph-config/) |
 
 #### Foundation
 
@@ -138,14 +127,14 @@ Full details: [Security](https://qso-graph.io/security/)
 ### Quick Start
 
 ```bash
-# One-line install (Linux / macOS)
-curl -sL https://qso-graph.io/install.sh | bash
+# Install uv once (Linux / macOS)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Launch the config manager
-qso-graph-config
-
-# Or run a single server directly with uv
+# Run any server
 uvx solar-mcp
+
+# Credentials for the logbook servers
+uv tool install qso-graph-auth
 ```
 
 Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code / GitHub Copilot, Windsurf, Gemini CLI, Goose, and Codex CLI — or use [qsp-client](https://github.com/qso-graph/qsp-client) to relay tools to any local LLM.
@@ -153,12 +142,6 @@ Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cur
 ### Architecture
 
 ```
-install.sh (bootstrap)          qso-graph-config (manager)
- └── ~/.qso-graph/               ├── Install / upgrade servers
-      ├── venv/                   ├── Credential setup (qso-auth)
-      ├── bin/ (PATH)             ├── Dataset downloads (ionis-mcp)
-      └── etc/state.json          └── MCP client config generation
-
 qso-graph-auth (identity)       MCP Servers (qso-graph)
  ├── PersonaManager        ──>   eqsl-mcp, qrz-mcp, lotw-mcp, hamqth-mcp
  ├── OS keyring credentials      Each server = 1 uvx       
