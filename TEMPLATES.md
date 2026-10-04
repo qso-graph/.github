@@ -14,7 +14,7 @@ single repo, update this file first and propagate.
 ## A release is done when it's published everywhere
 
 **A release is complete only when PyPI and the Official MCP Registry
-both serve the new version** (Judge, 2026-09-28). A PyPI release alone is
+both serve the new version** (KI7MT, 2026-09-28). A PyPI release alone is
 half a release.
 
 `publish.yml` enforces that, in this order:
@@ -232,7 +232,7 @@ that reads the `version` field from the first matching Registry entry.
 The 2026-05-16 rollout used **forward-only sync** (per Patton's review):
 Registry entries were left stale until each server's next real release.
 That left every server behind for months, with nothing failing
-(2026-09-28). **Superseded (Judge, 2026-09-28):** every MCP is brought up
+(2026-09-28). **Superseded (KI7MT, 2026-09-28):** every MCP is brought up
 to date in one sweep, each release carrying the real changes of the sweep
 (README layout, `server.json`, the release gates), and from then on the
 `verify` job keeps PyPI and the Registry in step. The badges stay as a
