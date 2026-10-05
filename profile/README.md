@@ -20,7 +20,7 @@ QSO Graph is a suite of open amateur radio tools: a net logger, a club service, 
 
 | Product | What it is | Status |
 |:--------|:-----------|:-------|
-| **QSO Graph Logger** (QGLogger) | A contest logger for nets: native desktop (Qt 6 / C++), with releases signed by more than one person and updates checked before they install | In development |
+| **QSO Graph Logger** (QGLogger) | A contest-style logger for nets. Lean, fast and secure: it runs the net, and hands your contacts to the logger you already use | In development |
 | **[QSO Graph SDK](https://github.com/qso-graph/qso-graph-sdk)** (QGSDK) | The build kit for QGLogger: one command to a pinned build environment on Windows or Linux, so anyone can build it | **Available** (open source) |
 | **qso-graph-adif** | The ADIF specification as a service: fields, enumerations and data types by version, validation and lookups, through an API and a web interface | Planned |
 | **qso-graph-core** | Club services for clubs that have none of their own: members, awards, net history | Planned |
@@ -39,7 +39,7 @@ Underneath all of it, continuously: the data. ADIF as the base, propagation as t
 
 **How the pieces fit:**
 
-- **[ADIF](https://adif.org/) is the anchor.** Everything here follows the ADIF specification, the format LoTW, eQSL, QRZ and every major logger share. Extensions only add to it, never contradict it.
+- **[ADIF](https://adif.org/) is the base.** Every QSO Graph tool reads and writes ADIF, the format LoTW, eQSL, QRZ and every major logger share, and uses ADIF's own definition for every field ADIF defines. **No one-off custom fields:** when a tool genuinely needs something ADIF doesn't have, it is defined **once**, published, and used the same way across every QSO Graph tool where it applies. That costs more than a quick private field, and it's a cost accepted deliberately: it's what keeps the tools working together, and what lets you take your log anywhere.
 - **Shared contracts, not shared code.** The pieces talk through published APIs and the same reference data (ADIF, DXCC), and are tested against the same recorded service responses, so a Python MCP server and a C++ application agree on what a service means.
 - **Each piece stands alone.** Every service is a library with thin layers over it: an API for applications, an MCP server for AI assistants, a web interface where people need one. Each ships as container images a club can run on its own server or a member's PC; desktop applications work on their own and connect to a club's services when there are some.
 
