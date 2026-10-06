@@ -30,8 +30,13 @@ could be a hundred PRs against the next release.
 A change that doesn't reach the published package (tests, scripts, CI, docs that aren't the README)
 still goes under `## Unreleased`, and needs no release of its own.
 
-**The one exception: a security vulnerability is released immediately**, without waiting for the
-milestone (KI7MT). Its fix gets its own PR, then a release PR and tag right after the merge.
+**What goes where** (KI7MT):
+
+| Kind | Release |
+|---|---|
+| **Security findings** | **Immediately**, however many there are: one or several findings can be fixed together, then released at once, without waiting for the milestone |
+| **Bug fixes** | The **next release's** milestone |
+| **Features** | The **next milestone**, or the next release if we are confident it's ready |
 
 ## A release is done when it's published everywhere
 
