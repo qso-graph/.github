@@ -11,32 +11,65 @@ single repo, update this file first and propagate.
 
 ---
 
-## The release cycle: many PRs, one release
+## How we develop and release (every qso-graph repo)
 
-**A pull request is never a release, and merging is never releasing** (KI7MT, 2026-10-06). There
-could be a hundred PRs against the next release.
+KI7MT, 2026-10-06. **Git Flow, lightweight**: two long-lived branches, short-lived work branches,
+and a release is one PR into `main`. Proven on adif-mcp 1.2.0.
 
-1. **Plan.** Each repo's next release is a GitHub **milestone** named for its version (e.g.
-   `netlogger-mcp 0.1.7`). Issues are assigned to it.
-2. **Develop.** Each fix or feature is its own PR, against the milestone: code, tests, and an entry
-   under `## Unreleased` at the top of `CHANGELOG.md`. **No version bump in a PR**: `pyproject.toml`,
-   `server.json` and `uv.lock` keep the released version. Reviewed, then merged to `main`. Any number
-   land this way.
-3. **Release**, when the milestone's issues are done **and KI7MT decides to release**: one release PR
-   that bumps the version in `pyproject.toml`, `server.json` (both places) and `uv.lock`, and renames
-   `## Unreleased` to the version and date. Merged, then the tag (`vX.Y.Z` on that merge commit)
-   runs `publish.yml` below. The milestone is closed when the run is green.
+| Branch | What it is | Who changes it |
+|---|---|---|
+| **`develop`** | the default branch; where work lands | merged PRs from work branches |
+| **`main`** | **exactly the released code**, always | merged release PRs (and security PRs) only |
+| `fix/…`, `feat/…`, `docs/…` | one issue's work, branched off `develop` | its author; deleted when merged |
+| `security/…` | a security fix, branched off `main` | its author |
 
-A change that doesn't reach the published package (tests, scripts, CI, docs that aren't the README)
-still goes under `## Unreleased`, and needs no release of its own.
+### The steps
 
-**What goes where** (KI7MT):
+1. **Plan.** Each repo's next release is a GitHub **milestone** named for its version
+   (`adif-mcp 1.2.0`). Issues go into it by lane:
 
-| Kind | Release |
-|---|---|
-| **Security findings** | **Immediately**, however many there are: one or several findings can be fixed together, then released at once, without waiting for the milestone |
-| **Bug fixes** | The **next release's** milestone |
-| **Features** | The **next milestone**, or the next release if we are confident it's ready |
+   | Kind | Release |
+   |---|---|
+   | **Security findings** | **Immediately**, however many: fixed together, released at once (below) |
+   | **Bug fixes** | the **next release's** milestone |
+   | **Features** | the **next milestone**, or the next release if confident it is ready |
+
+2. **Work.** One branch per issue off `develop`, one PR **into `develop`**: code, tests, and an
+   entry under `## [Unreleased]` in `CHANGELOG.md`. **No version bump.** Reviewed, merged. Any number
+   of these.
+3. **Release**, when every issue in the milestone is closed **and KI7MT says release**. Two PRs:
+   1. **Prepare**: a `release/X.Y.Z` branch off `develop`, PR into `develop`: bump the version in
+      `pyproject.toml`, `server.json` (two places) and `uv.lock`'s own entry; rename `[Unreleased]`
+      to `[X.Y.Z] - date`. Nothing else.
+   2. **Release**: PR from **`develop` into `main`**. **Merging it publishes**: `publish.yml` runs on
+      the push to `main`, publishes to PyPI and the MCP Registry, verifies both, and tags `vX.Y.Z`.
+      Close the milestone when the run is green.
+
+**Security fixes:** a `security/…` branch off **`main`**, with the fix and the patch version bump.
+PR it into `main` (merging publishes), then PR **the same branch** into `develop`, so `develop`
+has the fix too.
+
+A change that never reaches the published package (tests, scripts, CI, internal docs) still goes
+under `[Unreleased]` and counts toward its milestone; it needs no release of its own.
+
+### Repo settings (once per repo, before anything else)
+
+- **Default branch: `develop`.**
+- **Merge commits only**: squash and rebase merging off. A squash-merged release PR gives `main` a
+  commit `develop` doesn't have, and the branches drift apart.
+- **Ruleset "protect main and develop"**: no deletion, no force push, on both.
+- **`main` requires the `Release PR source` check** (`ci.yml`, below): PRs into `main` only from
+  `develop` or `security/…`.
+- "Automatically delete head branches" may stay on: protected branches can't be deleted.
+
+### Never
+
+- **Never open a PR whose head is `main` or `develop`.** With automatic branch deletion on,
+  merging it deletes that branch (this deleted adif-mcp's `main` on 2026-10-06).
+- **Never push straight to `main` or `develop`**, and never tag by hand: the tag comes from the
+  release run.
+- **Never rename `publish.yml`.** PyPI's trusted publishing is bound to the workflow's filename.
+- **Never bump a version in a work PR**, or release without KI7MT's go (security excepted).
 
 ## A release is done when it's published everywhere
 
@@ -44,15 +77,18 @@ still goes under `## Unreleased`, and needs no release of its own.
 both serve the new version** (KI7MT, 2026-09-28). A PyPI release alone is
 half a release.
 
-`publish.yml` enforces that, in this order:
+`publish.yml` runs on **every push to `main`** (a merged release PR) and enforces that, in this order:
 
-1. **Security gates**, including **the tag must equal `pyproject.toml`'s
-   version**. PyPI publishes pyproject's version and the Registry
-   publishes the tag's; a mismatch would release two different numbers.
+1. **`security`**: the **release gate** first. The version on `main` (from `pyproject.toml`) must be
+   **new**: only a 404 from PyPI counts as "not published", and only `git ls-remote` exit 2 as "no
+   such tag"; anything it cannot confirm stops the release (fails closed). `server.json` must match.
+   The version is computed here **once** and every later job uses it. Then the security tests.
 2. **`publish`**: PyPI, by trusted publishing (OIDC).
 3. **`registry-publish`**: the MCP Registry, by GitHub OIDC.
-4. **`verify`**: poll PyPI and the Registry until both report the tagged
-   version. **If either doesn't within 10 minutes, the run fails.**
+4. **`verify`**: poll PyPI and the Registry until both report the version. **If either doesn't
+   within 10 minutes, the run fails.**
+5. **`tag`**: tag `vX.Y.Z` on the released commit. A workflow's own tag push triggers nothing, so
+   the tag comes last. If it fails after a green `verify`, the release **is** published; re-run it.
 
 **A green run means published everywhere. A red run means the release
 isn't done**, whichever step went red. Fix it and finish it; don't leave
@@ -62,70 +98,118 @@ Why this exists: the Registry was never checked. On 2026-09-28 every
 qso-graph server in it was behind PyPI (solar-mcp: 0.2.1 on PyPI, 0.1.1 in
 the Registry since March), and no run had failed.
 
-### Tag gate (first step of the `security` job)
+### The canonical `publish.yml`
+
+Copy it whole; change nothing but the security-test path if the repo's differs. From adif-mcp
+(release 1.2.0, the first run of this flow, green end to end).
 
 ```yaml
-      # PyPI publishes pyproject's version; the Registry publishes the tag's.
-      # They must be the same, or the two would disagree about what was released.
-      - name: Tag matches pyproject.toml version
+name: Publish to PyPI
+
+# The release flow (qso-graph/.github TEMPLATES.md): work lands on `develop`; a release is a
+# PR from `develop` into `main`, and merging it publishes. `main` is always the released code.
+on:
+  push:
+    branches: [ main ]
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  security:
+    name: Security gate
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # main changes only by a release PR, so main's version must be new. PyPI publishes
+      # pyproject's version and the Registry server.json's, so they must agree too.
+      # Computed once; every later job uses this value (needs.security.outputs.version).
+      # The gate fails closed: anything it cannot confirm stops the release.
+      - name: The version on main is new and consistent
+        id: version
         run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          PKG_VERSION="$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)"
-          echo "tag=${TAG_VERSION} pyproject=${PKG_VERSION}"
-          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
-            echo "FAIL: tag v${TAG_VERSION} does not match pyproject.toml version ${PKG_VERSION}"
+          VERSION="$(grep -m1 '^version' pyproject.toml | cut -d'"' -f2)"
+          PACKAGE="$(jq -r '.packages[0].identifier' server.json)"
+          echo "pyproject=${VERSION} server.json=$(jq -r '.version' server.json)/$(jq -r '.packages[0].version' server.json)"
+          if [ "$(jq -r '.version' server.json)" != "$VERSION" ] || [ "$(jq -r '.packages[0].version' server.json)" != "$VERSION" ]; then
+            echo "FAIL: server.json does not match pyproject.toml version ${VERSION}"
             exit 1
           fi
-```
+          # Only a 404 means "not published yet"; unreachable or 5xx is not a yes.
+          CODE="$(curl -s -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/${PACKAGE}/${VERSION}/json")"
+          case "$CODE" in
+            404) echo "PyPI: ${PACKAGE} ${VERSION} is new" ;;
+            200) echo "FAIL: ${PACKAGE} ${VERSION} is already on PyPI. main changes only by a release PR with a new version."; exit 1 ;;
+            *)   echo "FAIL: PyPI returned ${CODE}; cannot confirm ${VERSION} is new"; exit 1 ;;
+          esac
+          # git ls-remote --exit-code: 2 means no such tag; anything else (0, 128) stops.
+          set +e
+          git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" > /dev/null
+          RC=$?
+          set -e
+          case "$RC" in
+            2) echo "tag v${VERSION} does not exist yet" ;;
+            0) echo "FAIL: tag v${VERSION} already exists"; exit 1 ;;
+            *) echo "FAIL: could not check tags (git ls-remote exited ${RC})"; exit 1 ;;
+          esac
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
-### Verify job (last, after `registry-publish`)
 
-```yaml
-  verify:
-    name: Verify PyPI and MCP Registry
-    needs: registry-publish
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      - name: PyPI and Registry serve the tagged version
+      - name: Install dependencies
+        run: pip install -e ".[test]"
+
+      - name: Security tests
+        run: python -m pytest test/test_security.py -v
+
+      - name: Static security checks
         run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          PACKAGE="$(jq -r '.packages[0].identifier' server.json)"
-          NAME="$(jq -r '.name' server.json)"
-          REGISTRY="https://registry.modelcontextprotocol.io/v0/servers?search=${NAME}&version=latest"
-          for i in $(seq 1 40); do
-            PYPI="$(curl -fsS "https://pypi.org/pypi/${PACKAGE}/json" | jq -r '.info.version' || true)"
-            REG="$(curl -fsS "$REGISTRY" | jq -r --arg n "$NAME" '[.servers[] | select(.server.name == $n) | .server.version][0] // empty' || true)"
-            echo "attempt ${i}: PyPI=${PYPI:-none} Registry=${REG:-none} want=${TAG_VERSION}"
-            if [ "$PYPI" = "$TAG_VERSION" ] && [ "$REG" = "$TAG_VERSION" ]; then
-              echo "Published everywhere: ${PACKAGE} ${TAG_VERSION} on PyPI and ${NAME} ${TAG_VERSION} in the MCP Registry"
-              exit 0
-            fi
-            sleep 15
-          done
-          echo "FAIL: release incomplete. PyPI=${PYPI:-none} Registry=${REG:-none}, expected ${TAG_VERSION}"
-          exit 1
-```
+          ! grep -rn "subprocess\|shell=True" src/ --include="*.py"
+          ! grep -rn 'http://[^l]' src/ --include="*.py"
+          ! grep -rni "print.*password\|print.*secret" src/ --include="*.py"
+          echo "Static checks passed"
 
----
+  publish:
+    name: Build and publish to PyPI
+    needs: security
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
 
-## Registry-publish job
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-**Purpose**: after a successful PyPI publish (triggered by a `v*` git
-tag), publish the same version to the [Official MCP Registry](https://registry.modelcontextprotocol.io)
-so discovery surfaces stay in sync with PyPI.
+      - name: Install build dependencies
+        run: pip install build
 
-**Auth model**: GitHub OIDC. No PATs or registry tokens to manage; the
-workflow's identity is bound to the repository and the workflow file.
+      - name: Build package
+        run: python -m build
 
-**Drop into each repo's `publish.yml`** as a new job, after the
-existing `publish` job:
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
 
-```yaml
+  # ---------------------------------------------------------------------------
+  # Registry-publish — pushes server.json to the Official MCP Registry after
+  # PyPI publish succeeds, so discovery surfaces stay in sync with PyPI.
+  # Canonical template: https://github.com/qso-graph/.github/blob/main/TEMPLATES.md
+  # ---------------------------------------------------------------------------
   registry-publish:
     name: Publish to MCP Registry
-    needs: publish  # waits for PyPI publish to succeed
+    needs: [security, publish]  # waits for PyPI publish to succeed
     runs-on: ubuntu-latest
     permissions:
       id-token: write   # GitHub OIDC
@@ -142,11 +226,11 @@ existing `publish` job:
           curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
           ./mcp-publisher --help > /dev/null  # smoke test
 
-      - name: Bump server.json to tag version
+      - name: Set server.json to the released version
         run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          echo "Setting server.json to ${TAG_VERSION}"
-          jq --arg v "$TAG_VERSION" \
+          VERSION="${{ needs.security.outputs.version }}"
+          echo "Setting server.json to ${VERSION}"
+          jq --arg v "$VERSION" \
              '.version = $v | .packages[0].version = $v' \
              server.json > /tmp/server.json
           mv /tmp/server.json server.json
@@ -156,17 +240,17 @@ existing `publish` job:
       # serving yet, which can lag the upload by a minute or more.
       - name: Wait until PyPI serves this version
         run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${{ needs.security.outputs.version }}"
           PACKAGE="$(jq -r '.packages[0].identifier' server.json)"
           for i in $(seq 1 40); do
-            if curl -fsS "https://pypi.org/pypi/${PACKAGE}/${TAG_VERSION}/json" > /dev/null; then
-              echo "PyPI serves ${PACKAGE} ${TAG_VERSION}"
+            if curl -fsS "https://pypi.org/pypi/${PACKAGE}/${VERSION}/json" > /dev/null; then
+              echo "PyPI serves ${PACKAGE} ${VERSION}"
               exit 0
             fi
-            echo "attempt ${i}: PyPI doesn't serve ${PACKAGE} ${TAG_VERSION} yet"
+            echo "attempt ${i}: PyPI doesn't serve ${PACKAGE} ${VERSION} yet"
             sleep 15
           done
-          echo "FAIL: PyPI never served ${PACKAGE} ${TAG_VERSION}"
+          echo "FAIL: PyPI never served ${PACKAGE} ${VERSION}"
           exit 1
 
       - name: Authenticate to MCP Registry (GitHub OIDC)
@@ -176,7 +260,7 @@ existing `publish` job:
       # retry, check whether an earlier attempt landed despite the error.
       - name: Publish to MCP Registry
         run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${{ needs.security.outputs.version }}"
           NAME="$(jq -r '.name' server.json)"
           REGISTRY="https://registry.modelcontextprotocol.io/v0/servers?search=${NAME}&version=latest"
           for i in 1 2 3 4 5; do
@@ -186,14 +270,98 @@ existing `publish` job:
             echo "attempt ${i} failed; retrying in $((i * 30)) s"
             sleep $((i * 30))
             REG="$(curl -fsS "$REGISTRY" | jq -r --arg n "$NAME" '[.servers[] | select(.server.name == $n) | .server.version][0] // empty' || true)"
-            if [ "$REG" = "$TAG_VERSION" ]; then
-              echo "The Registry already has ${NAME} ${TAG_VERSION}; an earlier attempt landed"
+            if [ "$REG" = "$VERSION" ]; then
+              echo "The Registry already has ${NAME} ${VERSION}; an earlier attempt landed"
               exit 0
             fi
           done
           echo "FAIL: the MCP Registry refused the publish 5 times"
           exit 1
+
+  # ---------------------------------------------------------------------------
+  # Verify — a release is complete only when PyPI AND the MCP Registry both
+  # serve the tagged version. If either doesn't within 10 minutes, this run
+  # fails: a green run means published everywhere, a red one means not done.
+  # ---------------------------------------------------------------------------
+  verify:
+    name: Verify PyPI and MCP Registry
+    needs: [security, registry-publish]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: PyPI and Registry serve the released version
+        run: |
+          VERSION="${{ needs.security.outputs.version }}"
+          PACKAGE="$(jq -r '.packages[0].identifier' server.json)"
+          NAME="$(jq -r '.name' server.json)"
+          REGISTRY="https://registry.modelcontextprotocol.io/v0/servers?search=${NAME}&version=latest"
+          for i in $(seq 1 40); do
+            PYPI="$(curl -fsS "https://pypi.org/pypi/${PACKAGE}/json" | jq -r '.info.version' || true)"
+            REG="$(curl -fsS "$REGISTRY" | jq -r --arg n "$NAME" '[.servers[] | select(.server.name == $n) | .server.version][0] // empty' || true)"
+            echo "attempt ${i}: PyPI=${PYPI:-none} Registry=${REG:-none} want=${VERSION}"
+            if [ "$PYPI" = "$VERSION" ] && [ "$REG" = "$VERSION" ]; then
+              echo "Published everywhere: ${PACKAGE} ${VERSION} on PyPI and ${NAME} ${VERSION} in the MCP Registry"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "FAIL: release incomplete. PyPI=${PYPI:-none} Registry=${REG:-none}, expected ${VERSION}"
+          exit 1
+
+  # ---------------------------------------------------------------------------
+  # Tag the release, once it is published everywhere. The tag marks the commit on
+  # main that was released; nothing is triggered by it. If this job fails after a
+  # green verify, the release IS published: re-running this job is safe.
+  # ---------------------------------------------------------------------------
+  tag:
+    name: Tag the release
+    needs: [security, verify]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Create and push vX.Y.Z
+        run: |
+          VERSION="${{ needs.security.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${VERSION}" -m "${GITHUB_REPOSITORY#*/} ${VERSION}" "$GITHUB_SHA"
+          git push origin "v${VERSION}"
 ```
+
+### The `Release PR source` check (`ci.yml`)
+
+```yaml
+  # main takes a release PR from develop, or a security branch, and nothing else:
+  # merging into main publishes. Required on main by its branch protection.
+  release-source:
+    name: Release PR source
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          case "${{ github.head_ref }}" in
+            develop|security/*) echo "ok: ${{ github.head_ref }} -> main" ;;
+            *) echo "main takes a release PR from develop, or a security/ branch"; exit 1 ;;
+          esac
+```
+
+`ci.yml` and any other CI workflow run on `push` to both `main` and `develop`, and on every PR.
+
+---
+
+## Registry-publish job
+
+**Purpose**: after a successful PyPI publish (triggered by a merged release PR on `main`), publish the same version to the [Official MCP Registry](https://registry.modelcontextprotocol.io)
+so discovery surfaces stay in sync with PyPI.
+
+**Auth model**: GitHub OIDC. No PATs or registry tokens to manage; the
+workflow's identity is bound to the repository and the workflow file.
+
+It is in the canonical `publish.yml` above (`registry-publish`).
 
 ### Why wait and retry
 
@@ -222,13 +390,12 @@ decides whether the release is done.
 4. The PyPI `publish` job must complete successfully before
    `registry-publish` runs (the `needs: publish` gate enforces this).
 
-### Why the bump step
+### Why the "set server.json" step
 
-The committed `server.json` has the version at the time it was last
-committed — which lags behind tag pushes. The bump step takes the tag
-(`v1.2.3` → `1.2.3`) and writes it into both `version` and
-`packages[0].version` in-memory before publish. The committed file is
-not modified by CI.
+The release gate already refuses a `server.json` that doesn't match `pyproject.toml`, so the
+committed file is right. The step writes the gate's version into `version` and
+`packages[0].version` in memory anyway, so the Registry can only ever receive the version PyPI was
+given. The committed file is not modified by CI.
 
 ### Why OIDC and not a PAT
 
@@ -382,21 +549,21 @@ Repos that also test Windows or macOS keep their `os` matrix.
 
 ## Rollout checklist (per repo)
 
-When applying this template to a new repo:
+In this order. Settings first, so nothing can be deleted or squashed while the rest changes.
 
-- [ ] `server.json` exists at repo root (run `mcp-publisher init` if not)
-- [ ] `server.json` `name` is `io.github.qso-graph/<repo-name>`
-- [ ] `server.json` `packages[0].registryType` is `pypi`
-- [ ] `server.json` `packages[0].identifier` matches the PyPI name
-- [ ] `.github/workflows/publish.yml` has the `registry-publish` job appended
-- [ ] `publish.yml` has the **tag gate** (first step of `security`) and the **`verify` job** (after `registry-publish`)
-- [ ] `server.json` validates: `mcp-publisher validate`
-- [ ] `README.md` has both PyPI and MCP Registry badges
-- [ ] **After the tag: the publish run is green through `verify`**. The release isn't done until it is.
-- [ ] `CHANGELOG.md` has the "MCP Registry sync" entry in the upcoming release
-- [ ] **uv**: `[dependency-groups] dev`, `uv.lock` committed, `ci.yml` on `setup-uv` with `uv sync --group dev --frozen`
-- [ ] README: `uvx` install and `uvx` client configs; Development section uses `uv sync` / `uv run pytest`
-- [ ] No other YAML changes; per-repo independence preserved
+- [ ] **Ruleset "protect main and develop"** (deletion, non-fast-forward) on `main` and `develop`
+- [ ] **Merge commits only** (squash and rebase off)
+- [ ] **`develop`** created from `main`, and made the **default branch**
+- [ ] One PR into `develop`: the canonical **`publish.yml`**, the **`Release PR source`** job in
+      `ci.yml`, CI on `push` to `main` and `develop`
+- [ ] `main` requires the `Release PR source` check (after that PR has run once, so the check exists)
+- [ ] `server.json` at repo root, `name` `io.github.qso-graph/<repo-name>`, `packages[0]`
+      `registryType: pypi`, `identifier` = the PyPI name; `mcp-publisher validate` passes
+- [ ] `CHANGELOG.md` has `## [Unreleased]` at the top
+- [ ] README has the PyPI and MCP Registry badges
+- [ ] **uv**: `[dependency-groups] dev`, `uv.lock` committed, `ci.yml` on `setup-uv` with
+      `uv sync --group dev --frozen`; README uses `uvx` and `uv sync` / `uv run pytest`
+- [ ] The next release goes through the flow, and its run is green through `tag`
 
 ---
 
