@@ -6,13 +6,13 @@
 
 **Open amateur radio software, built to work together.**
 
-QSO Graph is open amateur radio software for your station: logging, nets, awards, spots and your radio, in one place, on Windows, macOS and Linux, with the libraries and AI integrations behind them. They share one data model, publish their interfaces, and are built so that any of them can be used alone. Free software under the GPL, for individual operators and for clubs, small and large.
+QSO Graph is open amateur radio software for your station: logging, nets, awards, spots and your radio, in one place, on Windows, macOS and Linux, with the libraries and AI integrations behind them. **Today** that is the MCP servers and the libraries under them; **QSO Graph Desktop**, the app that brings it together, is in design. They share one data model, publish their interfaces, and are built so that any of them can be used alone. Free software under the GPL, for individual operators and for clubs, small and large.
 
 **[View the live demo →](https://qso-graph-demo.vercel.app/)** · **[Documentation →](https://qso-graph.io)**
 
 ## Today
 
-- **[MCP servers](#mcp-servers)** that connect AI assistants to the services hams use every day: QRZ, LoTW, eQSL, HamQTH, POTA, SOTA, IOTA, NOAA space weather, WSPR, NetLogger, N1MM Logger+, and the ADIF specification itself. Published on PyPI; each one runs with a single `uvx` command, nothing to install.
+- **[MCP servers](#mcp-servers)** that connect AI assistants to the services hams use every day: QRZ, LoTW, eQSL, HamQTH, POTA, SOTA, IOTA, NOAA space weather, WSPR, OMISS, NetLogger, N1MM Logger+, IONIS-AI propagation analytics, and the ADIF specification itself. Published on PyPI; each one runs with a single `uvx` command, nothing to install.
 - **[Tools](#packages)** that look after them: credential handling that keeps your passwords in your operating system's keyring, and a relay that gives local LLMs the same tools.
 - **[Live demos](#demos)** of what that makes possible: logbook analysis, and DXpedition propagation planning.
 
@@ -39,10 +39,10 @@ Underneath all of it, continuously: the data. ADIF as the base, propagation as t
 **How the pieces fit:**
 
 - **[ADIF](https://adif.org/) is the base.** Every QSO Graph tool reads and writes ADIF, the format LoTW, eQSL, QRZ and every major logger share, and uses ADIF's own definition for every field ADIF defines. **No one-off custom fields:** when a tool genuinely needs something ADIF doesn't have, it is defined **once**, published, and used the same way across every QSO Graph tool where it applies. That costs more than a quick private field, and it's a cost accepted deliberately: it's what keeps the tools working together, and what lets you take your log anywhere.
-- **Shared contracts, not shared code.** The pieces talk through published APIs and the same reference data (ADIF, DXCC), and are tested against the same recorded service responses, so a Python MCP server and a C++ application agree on what a service means.
-- **Each piece stands alone.** Every service is a library with thin layers over it: an API for applications, an MCP server for AI assistants, a web interface where people need one. Each ships as container images a club can run on its own server or a member's PC; desktop applications work on their own and connect to a club's services when there are some.
+- **Shared contracts, not shared code.** The pieces talk through published APIs and the same reference data (ADIF, DXCC), and are tested against the same recorded service responses, so a Python MCP server and the desktop app agree on what a service means.
+- **Each piece stands alone.** Every service is a library with thin layers over it: an MCP server for AI assistants, and the desktop app's own screens. Each works on its own; club features connect when a club has them.
 
-**What we don't do:** general-purpose logging, and anything that replaces LoTW, eQSL or QRZ. QSO Graph records, queries and predicts contacts, and connects to those services rather than standing in for them.
+**What we don't do:** replace LoTW, eQSL or QRZ. QSO Graph records, queries and predicts contacts, and connects to those services rather than standing in for them.
 
 ## MCP Servers
 
@@ -107,7 +107,7 @@ Full details: [Security](https://qso-graph.io/security/)
 | [iota-mcp](https://github.com/qso-graph/iota-mcp) | [IOTA](https://www.iota-world.org/) | 7 tools: group lookup, island search, DXCC mapping, nearby, stats, version info | [![PyPI](https://img.shields.io/pypi/v/iota-mcp?label=PyPI&color=blue)](https://pypi.org/project/iota-mcp/) |
 | [solar-mcp](https://github.com/qso-graph/solar-mcp) | [NOAA SWPC](https://www.swpc.noaa.gov/) | 7 tools: SFI, Kp, solar wind, X-ray flux, band outlook, alerts, version info | [![PyPI](https://img.shields.io/pypi/v/solar-mcp?label=PyPI&color=blue)](https://pypi.org/project/solar-mcp/) |
 | [wspr-mcp](https://github.com/qso-graph/wspr-mcp) | [WSPR](https://www.wsprnet.org/) | 9 tools: spots, band activity, top beacons/spotters, propagation, grid, SNR, version info | [![PyPI](https://img.shields.io/pypi/v/wspr-mcp?label=PyPI&color=blue)](https://pypi.org/project/wspr-mcp/) |
-| [ionis-mcp](https://github.com/qso-graph/ionis-mcp) | [IONIS-AI](https://github.com/IONIS-AI) | HF propagation analytics from 175M+ signatures (14B observations) | [![PyPI](https://img.shields.io/pypi/v/ionis-mcp?label=PyPI&color=blue)](https://pypi.org/project/ionis-mcp/) |
+| [ionis-mcp](https://github.com/qso-graph/ionis-mcp) | [IONIS-AI](https://github.com/IONIS-AI) | 12 tools: HF propagation analytics from 175M+ signatures (14B observations) | [![PyPI](https://img.shields.io/pypi/v/ionis-mcp?label=PyPI&color=blue)](https://pypi.org/project/ionis-mcp/) |
 | [omiss-mcp](https://github.com/qso-graph/omiss-mcp) | [OMISS](https://www.omiss.net/) | 13 tools: net schedule, nets on the air, member lookup, check-in history, past net check-ins, Statehood, officers, awards, award rules, award recipients, net statistics, set callsign, version info | [![PyPI](https://img.shields.io/pypi/v/omiss-mcp?label=PyPI&color=blue&cacheSeconds=3600)](https://pypi.org/project/omiss-mcp/) |
 
 #### Radio Logging
@@ -143,11 +143,12 @@ Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cur
 ```
 qso-graph-auth (identity)       MCP Servers (qso-graph)
  ├── PersonaManager        ──>   eqsl-mcp, qrz-mcp, lotw-mcp, hamqth-mcp
- ├── OS keyring credentials      Each server = 1 uvx       
- └── qso-auth CLI                Each server = 4-8 MCP tools
+ ├── OS keyring credentials      Each server = 1 uvx
+ └── qso-auth CLI                Each server = 5-13 MCP tools
 
 adif-mcp (ADIF spec)            Public Servers
- └── 8 spec tools          ──>   solar, pota, sota, iota, wspr (no auth)
+ └── 8 spec tools          ──>   solar, pota, sota, iota, wspr, omiss,
+                                 ionis, netlogger (no auth); n1mm (local)
 
 qsp-client (tool relay)         Local LLM Inference
  └── Stateless pipe        ──>   llama.cpp, Ollama, vLLM, SGLang
