@@ -20,18 +20,16 @@ QSO Graph is open amateur radio software for your station: logging, nets, awards
 
 | Product | What it is | Status |
 |:--------|:-----------|:-------|
-| **QSO Graph Logger** (QGLogger) | A contest-style logger for nets. Lean, fast and secure: it runs the net, and hands your contacts to the logger you already use | In development |
-| **[QSO Graph SDK](https://github.com/qso-graph/qso-graph-sdk)** (QGSDK) | The build kit for QGLogger: one command to a pinned build environment on Windows or Linux, so anyone can build it | **Available** (open source) |
-| **qso-graph-adif** | The ADIF specification as a service: fields, enumerations and data types by version, validation and lookups, through an API and a web interface | Planned |
-| **qso-graph-core** | Club services for clubs that have none of their own: members, awards, net history | Planned |
-| **qso-graph-atlas** | HF propagation data and analysis | Planned |
+| **QSO Graph Desktop** | One app for your station on Windows, macOS and Linux: your logbook, nets, awards, spots and your radio, with your callsigns and logins kept in your own OS keyring | In design |
+
+Earlier plans for a separate net logger, its SDK, an ADIF service and a self-hosted club server are folded into it.
 
 Products are linked here as each becomes public.
 
 **In order:**
 
-1. **Now: one product, properly.** QGLogger runs nets, and QGSDK proves anyone can build it.
-2. **Next: the clubs with nothing.** qso-graph-core, for the many clubs and nets that have no software or server of their own.
+1. **Now: one app for the station, designed properly.** QSO Graph Desktop, built to enterprise security standards.
+2. **With it: the clubs with nothing.** Club rosters, nets and awards for the many clubs and nets that have no software or server of their own.
 3. **Then: publish the seams.** The interfaces between the pieces become published specifications that anyone can implement, including software that isn't ours.
 4. **Eventually: governance that isn't us.** Clubs, small and large with an equal voice, steering the parts that affect them, through the specifications.
 
