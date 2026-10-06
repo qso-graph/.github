@@ -30,6 +30,9 @@ could be a hundred PRs against the next release.
 A change that doesn't reach the published package (tests, scripts, CI, docs that aren't the README)
 still goes under `## Unreleased`, and needs no release of its own.
 
+**The one exception: a security vulnerability is released immediately**, without waiting for the
+milestone (KI7MT). Its fix gets its own PR, then a release PR and tag right after the merge.
+
 ## A release is done when it's published everywhere
 
 **A release is complete only when PyPI and the Official MCP Registry
