@@ -11,6 +11,28 @@ single repo, update this file first and propagate.
 
 ---
 
+## The release cycle: many PRs, one release
+
+**A pull request is never a release, and merging is never releasing** (KI7MT, 2026-10-06). There
+could be a hundred PRs against the next release.
+
+1. **Plan.** Each repo's next release is a GitHub **milestone** named for its version (e.g.
+   `netlogger-mcp 0.1.7`). Issues are assigned to it.
+2. **Develop.** Each fix or feature is its own PR, against the milestone: code, tests, and an entry
+   under `## Unreleased` at the top of `CHANGELOG.md`. **No version bump in a PR**: `pyproject.toml`,
+   `server.json` and `uv.lock` keep the released version. Reviewed, then merged to `main`. Any number
+   land this way.
+3. **Release**, when the milestone's issues are done **and KI7MT decides to release**: one release PR
+   that bumps the version in `pyproject.toml`, `server.json` (both places) and `uv.lock`, and renames
+   `## Unreleased` to the version and date. Merged, then the tag (`vX.Y.Z` on that merge commit)
+   runs `publish.yml` below. The milestone is closed when the run is green.
+
+A change that doesn't reach the published package (tests, scripts, CI, docs that aren't the README)
+still goes under `## Unreleased`, and needs no release of its own.
+
+**The one exception: a security vulnerability is released immediately**, without waiting for the
+milestone (KI7MT). Its fix gets its own PR, then a release PR and tag right after the merge.
+
 ## A release is done when it's published everywhere
 
 **A release is complete only when PyPI and the Official MCP Registry
