@@ -57,7 +57,10 @@ under `[Unreleased]` and counts toward its milestone; it needs no release of its
 - **Default branch: `develop`.**
 - **Merge commits only**: squash and rebase merging off. A squash-merged release PR gives `main` a
   commit `develop` doesn't have, and the branches drift apart.
-- **Ruleset "protect main and develop"**: no deletion, no force push, on both.
+- **Ruleset "protect main and develop"**, on both: no deletion, no force push, and **a pull request
+  required before merging** (zero approvals required: reviews are posted as comments, and KI7MT
+  merges). Without the PR rule, a direct push to `main` would skip the `Release PR source` check,
+  which runs on pull requests only, and still publish.
 - **`main` requires the `Release PR source` check** (`ci.yml`, below): PRs into `main` only from
   `develop` or `security/…`.
 - "Automatically delete head branches" may stay on: protected branches can't be deleted.
@@ -551,7 +554,8 @@ Repos that also test Windows or macOS keep their `os` matrix.
 
 In this order. Settings first, so nothing can be deleted or squashed while the rest changes.
 
-- [ ] **Ruleset "protect main and develop"** (deletion, non-fast-forward) on `main` and `develop`
+- [ ] **Ruleset "protect main and develop"** on `main` and `develop`: deletion, non-fast-forward,
+      and **pull request required** (0 approvals)
 - [ ] **Merge commits only** (squash and rebase off)
 - [ ] **`develop`** created from `main`, and made the **default branch**
 - [ ] One PR into `develop`: the canonical **`publish.yml`**, the **`Release PR source`** job in
