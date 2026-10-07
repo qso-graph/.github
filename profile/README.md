@@ -116,9 +116,9 @@ The lists ADIF's fields point to but ADIF doesn't define, each as its owner publ
 
 | Package | Owner's list | Tools | Status |
 |:--------|:-------------|:------|:-------|
-| [cq-zones-mcp](https://github.com/qso-graph/cq-zones-mcp) | CQ zones: [CQ's WAZ Zone Definitions](https://cqww.com/cq_waz_list.htm) (CQ / WWROF) | 6 tools: lookup, codes for an entity, search, valid on a date, source info, version info | [![PyPI](https://img.shields.io/pypi/v/cq-zones-mcp?label=PyPI&color=blue)](https://pypi.org/project/cq-zones-mcp/) |
-| [itu-zones-mcp](https://github.com/qso-graph/itu-zones-mcp) | ITU zones: [IARU HF Managers Handbook, ch. 9.8](https://www.iaru-r1.org/wp-content/uploads/2019/12/IARURegion1HFManagerHandbook8.2.1.pdf) (IARU Region 1) | 6 tools: lookup, codes for an entity, search, valid on a date, source info, version info | [![PyPI](https://img.shields.io/pypi/v/itu-zones-mcp?label=PyPI&color=blue)](https://pypi.org/project/itu-zones-mcp/) |
-| [darc-dok-mcp](https://github.com/qso-graph/darc-dok-mcp) | DOKs and special DOKs: [DARC](https://www.darc.de/)'s DOK-Liste and special-DOK list | 6 tools: lookup, valid on a date, search, codes for an entity, source info, version info | [![PyPI](https://img.shields.io/pypi/v/darc-dok-mcp?label=PyPI&color=blue)](https://pypi.org/project/darc-dok-mcp/) |
+| [cq-zones-mcp](https://github.com/qso-graph/cq-zones-mcp) | CQ zones: [CQ's WAZ Zone Definitions](https://cqww.com/cq_waz_list.htm) (CQ / WWROF) | 6 tools: lookup, codes for an entity, search, valid on a date, source info, version info | [![PyPI](https://img.shields.io/pypi/v/cq-zones-mcp?label=PyPI&color=blue&cacheSeconds=3600)](https://pypi.org/project/cq-zones-mcp/) |
+| [itu-zones-mcp](https://github.com/qso-graph/itu-zones-mcp) | ITU zones: [IARU HF Managers Handbook, ch. 9.8](https://www.iaru-r1.org/wp-content/uploads/2019/12/IARURegion1HFManagerHandbook8.2.1.pdf) (IARU Region 1) | 6 tools: lookup, codes for an entity, search, valid on a date, source info, version info | [![PyPI](https://img.shields.io/pypi/v/itu-zones-mcp?label=PyPI&color=blue&cacheSeconds=3600)](https://pypi.org/project/itu-zones-mcp/) |
+| [darc-dok-mcp](https://github.com/qso-graph/darc-dok-mcp) | DOKs and special DOKs: [DARC](https://www.darc.de/)'s DOK-Liste and special-DOK list | 6 tools: lookup, valid on a date, search, codes for an entity, source info, version info | [![PyPI](https://img.shields.io/pypi/v/darc-dok-mcp?label=PyPI&color=blue&cacheSeconds=3600)](https://pypi.org/project/darc-dok-mcp/) |
 
 #### Radio Logging
 
