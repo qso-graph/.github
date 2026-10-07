@@ -133,7 +133,20 @@ The lists ADIF's fields point to but ADIF doesn't define, each as its owner publ
 |:--------|:--------|:-------|
 | [qsp-client](https://github.com/qso-graph/qsp-client) | QSP — an MCP client that relays tools to any local LLM (llama.cpp, Ollama, vLLM, SGLang). Formerly qsp-mcp | [![PyPI](https://img.shields.io/pypi/v/qsp-client?label=PyPI&color=blue)](https://pypi.org/project/qsp-client/) |
 
-### Quick Start
+## Demos
+
+| Demo | Description | Status |
+|:-----|:------------|:-------|
+| [qso-graph-demo](https://github.com/qso-graph/qso-graph-demo) | QSO logbook analysis showcase (Next.js / Vercel) | [Live Demo](https://qso-graph-demo.vercel.app/) |
+| [dxpedition-demo](https://github.com/qso-graph/dxpedition-demo) | DXpedition propagation analysis — 3Y0K Bouvet Island (Next.js / Vercel) | [Live Demo](https://dxpedition-demo.vercel.app/) |
+
+## Related Projects
+
+| Project | Description |
+|:--------|:------------|
+| [ionis-jupyter](https://github.com/IONIS-AI/ionis-jupyter) | Jupyter notebooks for propagation research |
+
+## Quick Start
 
 ```bash
 # Install uv once (Linux / macOS)
@@ -148,7 +161,7 @@ uv tool install qso-graph-auth
 
 Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code / GitHub Copilot, Windsurf, Gemini CLI, Goose, and Codex CLI — or use [qsp-client](https://github.com/qso-graph/qsp-client) to relay tools to any local LLM.
 
-### Architecture
+## Architecture
 
 ```
 qso-graph-auth (identity)       MCP Servers (qso-graph)
@@ -165,19 +178,6 @@ qsp-client (tool relay)         Local LLM Inference
      MCP tools → OpenAI           Any model with function calling
      tools format                  Zero cloud dependency
 ```
-
-## Demos
-
-| Demo | Description | Status |
-|:-----|:------------|:-------|
-| [qso-graph-demo](https://github.com/qso-graph/qso-graph-demo) | QSO logbook analysis showcase (Next.js / Vercel) | [Live Demo](https://qso-graph-demo.vercel.app/) |
-| [dxpedition-demo](https://github.com/qso-graph/dxpedition-demo) | DXpedition propagation analysis — 3Y0K Bouvet Island (Next.js / Vercel) | [Live Demo](https://dxpedition-demo.vercel.app/) |
-
-## Related Projects
-
-| Project | Description |
-|:--------|:------------|
-| [ionis-jupyter](https://github.com/IONIS-AI/ionis-jupyter) | Jupyter notebooks for propagation research |
 
 ## Reporting Security Issues
 
