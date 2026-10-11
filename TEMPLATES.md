@@ -445,15 +445,16 @@ Add this to every repo's CHANGELOG when the registry-publish job lands:
 ### Added (CI hygiene)
 
 - **MCP Registry sync** — `publish.yml` now publishes to the [Official MCP Registry](https://registry.modelcontextprotocol.io)
-  after each PyPI publish, using GitHub OIDC for auth. Triggered on
-  `v*` tag push; no manual steps. Pattern documented in
+  after each PyPI publish, using GitHub OIDC for auth. Triggered by
+  merging a release PR into `main`; no manual steps. Pattern documented in
   [qso-graph/.github/TEMPLATES.md](https://github.com/qso-graph/.github/blob/main/TEMPLATES.md).
 - **Registry version badge** in README — PyPI and Registry versions
   are visible side-by-side so any drift between publishing surfaces
   is immediately apparent.
-- **Release gates** — the tag must match `pyproject.toml`, and a
-  `verify` job fails the release unless PyPI and the MCP Registry
-  both serve the new version.
+- **Release gates** — `server.json` must agree with `pyproject.toml`, the
+  version must be absent from PyPI and untagged, and a `verify` job fails
+  the release unless PyPI and the MCP Registry both serve the new version
+  before the tag is cut.
 ```
 
 ---
@@ -550,6 +551,41 @@ Repos that also test Windows or macOS keep their `os` matrix.
 
 ---
 
+## MCP protocol conformance
+
+A qso-graph MCP server must be valid against the **Model Context Protocol specification**, not only
+against our own conventions. This file describes how to *publish* a server in detail; these are the
+things that make one *valid*, measured against revision `2026-07-28`.
+
+**Tool errors set `isError`.** A tool execution error — bad input, upstream failure, business-logic
+refusal — is reported in the result with `isError: true`. Returning `{"error": "..."}` as a successful
+result hides the failure from the model, and the spec says so directly: otherwise "the LLM would not be
+able to see that an error occurred and self-correct". Raise `ToolError` and FastMCP sets the flag.
+Errors in *finding* a tool stay JSON-RPC protocol errors.
+
+**Every tool declares its annotation hints**, because the defaults are pessimistic:
+
+| Field | Default when omitted |
+|---|---|
+| `readOnlyHint` | false |
+| `destructiveHint` | **true** |
+| `idempotentHint` | false |
+| `openWorldHint` | **true** |
+
+A read-only tool that declares nothing is advertised as potentially destructive and open-world, and a
+client is then entitled to put a confirmation prompt in front of it. `openWorldHint` is the one that
+varies per tool: true where it reads a live external service, false where it answers from carried data.
+Annotations are a client UX hint and **never a security control** — the spec requires clients to treat
+them as untrusted.
+
+**Protocol revision currency is a dependency decision**, tracked once for the fleet. Do not hand-roll
+protocol features the installed `fastmcp`/`mcp` does not implement.
+
+See `qso-graph-devel/planning/MCP-SECURITY-FRAMEWORK.md` for the full section, and the specification at
+https://modelcontextprotocol.io/specification/latest.
+
+---
+
 ## Rollout checklist (per repo)
 
 In this order. Settings first, so nothing can be deleted or squashed while the rest changes.
@@ -567,6 +603,12 @@ In this order. Settings first, so nothing can be deleted or squashed while the r
 - [ ] README has the PyPI and MCP Registry badges
 - [ ] **uv**: `[dependency-groups] dev`, `uv.lock` committed, `ci.yml` on `setup-uv` with
       `uv sync --group dev --frozen`; README uses `uvx` and `uv sync` / `uv run pytest`
+- [ ] **MCP protocol conformance** (revision `2026-07-28`):
+      tool execution errors raise `ToolError` so the result carries `isError: true`;
+      every tool declares `readOnlyHint`, `destructiveHint`, `idempotentHint` and
+      `openWorldHint`; a test asserts both
+- [ ] **TLS**: outbound HTTPS over stdlib `urllib` uses a `certifi` root set, and a test
+      asserts `CERT_REQUIRED` and `check_hostname` — verification is never disabled
 - [ ] The next release goes through the flow, and its run is green through `tag`
 
 ---
