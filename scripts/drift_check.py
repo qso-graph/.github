@@ -28,8 +28,12 @@ import urllib.parse
 import urllib.request
 
 ORG = "qso-graph"
-# *-mcp repos that aren't servers (the retired Homebrew tap, until it's archived).
-NOT_SERVERS = {"homebrew-mcp"}
+# *-mcp repos that aren't servers. Empty since 2026-10-25: the one entry was the
+# retired Homebrew tap, kept "until it's archived" — it was deleted instead, so
+# the org listing no longer returns it and the exclusion could never match. Kept
+# as a named set rather than deleted, because the next non-server *-mcp repo
+# should land here instead of being special-cased at the call site.
+NOT_SERVERS: set[str] = set()
 REGISTRY = "https://registry.modelcontextprotocol.io/v0/servers"
 UA = "qso-graph-drift-check (+https://github.com/qso-graph/.github)"
 DRIFT = 10  # distinct from 1, which is what a crash exits with
