@@ -1,14 +1,14 @@
 # QSO Graph — Open-Source Software for Amateur Radio
 
-[![Live Demo](https://img.shields.io/badge/demo-live-22c55e?style=flat-square&logo=vercel)](https://qso-graph-demo.vercel.app/)
-[![DXpedition Demo](https://img.shields.io/badge/DXpeditions-3Y0K_Bouvet-f59e0b?style=flat-square&logo=vercel)](https://dxpedition-demo.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/demo-live-22c55e?style=flat-square&logo=github)](https://qso-graph.io/qso-graph-demo-logbook/)
+[![DXpedition Demo](https://img.shields.io/badge/DXpeditions-3Y0K_Bouvet-f59e0b?style=flat-square&logo=github)](https://qso-graph.io/qso-graph-demo-dxpedition/)
 [![Docs](https://img.shields.io/badge/docs-qso--graph.io-3b82f6?style=flat-square)](https://qso-graph.io)
 
 **Open amateur radio software, built to work together.**
 
-QSO Graph is open amateur radio software for your station: logging, nets, awards, spots and your radio, in one place, on Windows, macOS and Linux, with the libraries and AI integrations behind them. **Today** that is the MCP servers and the libraries under them; **QSO Graph Desktop**, the app that brings it together, is in design. They share one data model, publish their interfaces, and are built so that any of them can be used alone. Free software under the GPL, for individual operators and for clubs, small and large.
+QSO Graph is open amateur radio software for your station: logging, nets, awards, spots and your radio, in one place, on Windows, macOS and Linux, with the libraries and AI integrations behind them. **Today** that is the MCP servers and the libraries under them; **QSO Graph Desktop**, the app that brings it together, has its first releases. They share one data model, publish their interfaces, and are built so that any of them can be used alone. Free software under the GPL, for individual operators and for clubs, small and large.
 
-**[View the live demo →](https://qso-graph-demo.vercel.app/)** · **[Documentation →](https://qso-graph.io)**
+**[View the live demo →](https://qso-graph.io/qso-graph-demo-logbook/)** · **[Documentation →](https://qso-graph.io)**
 
 ## Today
 
@@ -20,8 +20,8 @@ QSO Graph is open amateur radio software for your station: logging, nets, awards
 
 | Product | What it is | Status |
 |:--------|:-----------|:-------|
-| **QSO Graph Desktop** | One app for your station on Windows, macOS and Linux: your logbook, nets, awards, spots and your radio, with your callsigns and logins kept in your own OS keyring | In design |
-| **[QSO Graph SDK](https://github.com/qso-graph/qso-graph-sdk)** (QGSDK) | The build kit for QSO Graph's standalone apps: Qt and CMake, one command to a pinned build environment on Windows or Linux, so anyone can build them | **Available** (open source) |
+| **[QSO Graph Desktop](https://github.com/qso-graph/qso-graph-desktop)** | One app for your station on Windows, macOS and Linux: your logbook, nets, awards, spots and your radio, with your callsigns and logins kept in your own OS keyring | **Early releases** ([latest](https://github.com/qso-graph/qso-graph-desktop/releases/latest)), growing milestone by milestone |
+| **[QSO Graph SDK](https://github.com/qso-graph/qso-graph-sdk)** (QGSDK) | The build kit: pick what you work on (QSO Graph Desktop, the Qt logger, or the MCP servers) and get exactly its tools, pinned, with one command on Windows, Linux or macOS, so anyone can build them | **Available** ([latest](https://github.com/qso-graph/qso-graph-sdk/releases/latest)) |
 
 Earlier plans for a separate net logger, an ADIF service and a self-hosted club server are folded into it.
 
@@ -29,7 +29,7 @@ Products are linked here as each becomes public.
 
 **In order:**
 
-1. **Now: one app for the station, designed properly.** QSO Graph Desktop, built to enterprise security standards.
+1. **Now: one app for the station, built properly.** QSO Graph Desktop, to enterprise security standards; its first releases are out.
 2. **With it: the clubs with nothing.** Club rosters, nets and awards for the many clubs and nets that have no software or server of their own.
 3. **Then: publish the seams.** The interfaces between the pieces become published specifications that anyone can implement, including software that isn't ours.
 4. **Eventually: governance that isn't us.** Clubs, small and large with an equal voice, steering the parts that affect them, through the specifications.
@@ -137,8 +137,8 @@ The lists ADIF's fields point to but ADIF doesn't define, each as its owner publ
 
 | Demo | Description | Status |
 |:-----|:------------|:-------|
-| [qso-graph-demo](https://github.com/qso-graph/qso-graph-demo) | QSO logbook analysis showcase (Next.js / Vercel) | [Live Demo](https://qso-graph-demo.vercel.app/) |
-| [dxpedition-demo](https://github.com/qso-graph/dxpedition-demo) | DXpedition propagation analysis — 3Y0K Bouvet Island (Next.js / Vercel) | [Live Demo](https://dxpedition-demo.vercel.app/) |
+| [qso-graph-demo-logbook](https://github.com/qso-graph/qso-graph-demo-logbook) | QSO logbook analysis showcase (Next.js, GitHub Pages) | [Live Demo](https://qso-graph.io/qso-graph-demo-logbook/) |
+| [qso-graph-demo-dxpedition](https://github.com/qso-graph/qso-graph-demo-dxpedition) | DXpedition propagation analysis — 3Y0K Bouvet Island (Next.js, GitHub Pages) | [Live Demo](https://qso-graph.io/qso-graph-demo-dxpedition/) |
 
 ## Related Projects
 
