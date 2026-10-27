@@ -21,7 +21,7 @@ QSO Graph is open amateur radio software for your station: logging, nets, awards
 | Product | What it is | Status |
 |:--------|:-----------|:-------|
 | **[QSO Graph Desktop](https://github.com/qso-graph/qso-graph-desktop)** | One app for your station on Windows, macOS and Linux: your logbook, nets, awards, spots and your radio, with your callsigns and logins kept in your own OS keyring | **Early releases** ([latest](https://github.com/qso-graph/qso-graph-desktop/releases/latest)), growing milestone by milestone |
-| **[QSO Graph SDK](https://github.com/qso-graph/qso-graph-sdk)** (QGSDK) | The build kit: pick what you work on (QSO Graph Desktop, the Qt logger, or the MCP servers) and get exactly its tools, pinned, with one command on Windows, Linux or macOS, so anyone can build them | **Available** ([latest](https://github.com/qso-graph/qso-graph-sdk/releases/latest)) |
+| **[QSO Graph SDK](https://github.com/qso-graph/qso-graph-sdk)** (QGSDK) | The build kit: pick what you work on (QSO Graph Desktop or the MCP servers) and get exactly its tools, pinned, with one command on Windows, Linux or macOS, so anyone can build them | **Available** ([latest](https://github.com/qso-graph/qso-graph-sdk/releases/latest)) |
 
 Earlier plans for a separate net logger, an ADIF service and a self-hosted club server are folded into it.
 
@@ -75,8 +75,13 @@ Command-line tools install with `uv tool install`: `qso-graph-auth` (credentials
 - Credentials never appear in MCP tool results, error messages, or debug output — enforced by architecture, not policy
 - No command injection surface — no `subprocess`, no `shell=True`, no `eval`
 - All external connections HTTPS only
-- Rate limiting on every API to prevent account bans
-- Independent security audit required before every PyPI release
+- Every server that calls an outside service respects that service's request limits, and
+  treats a `429` as the limit it is: it waits the interval the service asks for rather than
+  retrying into it
+- A security gate every PyPI release must pass before the upload runs: the security test
+  suite, a dependency audit against known advisories, and source checks for credential
+  logging, plaintext `http://` and subprocess use. It is mechanical, not a review — nothing
+  ships past a red gate, and no human sign-off is claimed in its place
 
 Full details: [Security](https://qso-graph.io/security/)
 
@@ -108,6 +113,8 @@ Full details: [Security](https://qso-graph.io/security/)
 | [solar-mcp](https://github.com/qso-graph/solar-mcp) | [NOAA SWPC](https://www.swpc.noaa.gov/) | 7 tools: SFI, Kp, solar wind, X-ray flux, band outlook, alerts, version info | [![PyPI](https://img.shields.io/pypi/v/solar-mcp?label=PyPI&color=blue)](https://pypi.org/project/solar-mcp/) |
 | [wspr-mcp](https://github.com/qso-graph/wspr-mcp) | [WSPR](https://www.wsprnet.org/) | 9 tools: spots, band activity, top beacons/spotters, propagation, grid, SNR, version info | [![PyPI](https://img.shields.io/pypi/v/wspr-mcp?label=PyPI&color=blue)](https://pypi.org/project/wspr-mcp/) |
 | [ionis-mcp](https://github.com/qso-graph/ionis-mcp) | [IONIS-AI](https://github.com/IONIS-AI) | 12 tools: HF propagation analytics from 175M+ signatures (14B observations) | [![PyPI](https://img.shields.io/pypi/v/ionis-mcp?label=PyPI&color=blue)](https://pypi.org/project/ionis-mcp/) |
+| [eme-mcp](https://github.com/qso-graph/eme-mcp) | moonbounce (computed locally) | 5 tools: moon window, path loss, degradation, calendar, version info | [![PyPI](https://img.shields.io/pypi/v/eme-mcp?label=PyPI&color=blue&cacheSeconds=3600)](https://pypi.org/project/eme-mcp/) |
+| [meteor-mcp](https://github.com/qso-graph/meteor-mcp) | [Global Meteor Network](https://globalmeteornetwork.org/) + NASA CNEOS | 7 tools: best windows, showers, shower info, activity, fireballs, source info, version info | [![PyPI](https://img.shields.io/pypi/v/meteor-mcp?label=PyPI&color=blue&cacheSeconds=3600)](https://pypi.org/project/meteor-mcp/) |
 | [omiss-mcp](https://github.com/qso-graph/omiss-mcp) | [OMISS](https://www.omiss.net/) | 14 tools: net schedule, nets on the air, member lookup, check-in history, past net check-ins, Statehood, officers, awards, award rules, award recipients, award eligibility, net statistics, set callsign, version info | [![PyPI](https://img.shields.io/pypi/v/omiss-mcp?label=PyPI&color=blue&cacheSeconds=3600)](https://pypi.org/project/omiss-mcp/) |
 
 #### Reference Data (No Auth, No Network)
@@ -119,6 +126,19 @@ The lists ADIF's fields point to but ADIF doesn't define, each as its owner publ
 | [cq-zones-mcp](https://github.com/qso-graph/cq-zones-mcp) | CQ zones: [CQ's WAZ Zone Definitions](https://cqww.com/cq_waz_list.htm) (CQ / WWROF) | 6 tools: lookup, codes for an entity, search, valid on a date, source info, version info | [![PyPI](https://img.shields.io/pypi/v/cq-zones-mcp?label=PyPI&color=blue&cacheSeconds=3600)](https://pypi.org/project/cq-zones-mcp/) |
 | [itu-zones-mcp](https://github.com/qso-graph/itu-zones-mcp) | ITU zones: [IARU HF Managers Handbook, ch. 9.8](https://www.iaru-r1.org/wp-content/uploads/2019/12/IARURegion1HFManagerHandbook8.2.1.pdf) (IARU Region 1) | 6 tools: lookup, codes for an entity, search, valid on a date, source info, version info | [![PyPI](https://img.shields.io/pypi/v/itu-zones-mcp?label=PyPI&color=blue&cacheSeconds=3600)](https://pypi.org/project/itu-zones-mcp/) |
 | [darc-dok-mcp](https://github.com/qso-graph/darc-dok-mcp) | DOKs and special DOKs: [DARC](https://www.darc.de/)'s DOK-Liste and special-DOK list | 6 tools: lookup, valid on a date, search, codes for an entity, source info, version info | [![PyPI](https://img.shields.io/pypi/v/darc-dok-mcp?label=PyPI&color=blue&cacheSeconds=3600)](https://pypi.org/project/darc-dok-mcp/) |
+
+#### Published, not yet working
+
+On PyPI so the name is reserved and the release machinery is proven, and each
+answers `get_version_info` with *"in development — no working tools yet"*. They
+are listed here so that is said rather than discovered: installing one today
+gets you a version number and nothing else.
+
+| Package | Planned | Status |
+|:--------|:--------|:-------|
+| [dxe-mcp](https://github.com/qso-graph/dxe-mcp) | DXpedition tracking | In development — no working tools |
+| [js8call-mcp](https://github.com/qso-graph/js8call-mcp) | JS8Call HF messaging | In development — no working tools |
+| [qso-graph-contest-mcp](https://github.com/qso-graph/qso-graph-contest-mcp) | Contest calendar and rules | In development — no working tools |
 
 #### Radio Logging
 
@@ -167,7 +187,7 @@ Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cur
 qso-graph-auth (identity)       MCP Servers (qso-graph)
  ├── PersonaManager        ──>   eqsl-mcp, qrz-mcp, lotw-mcp, hamqth-mcp
  ├── OS keyring credentials      Each server = 1 uvx
- └── qso-auth CLI                Each server = 5-13 MCP tools
+ └── qso-auth CLI                Each server = 5-14 MCP tools
 
 adif-mcp (ADIF spec)            Public Servers
  └── 8 spec tools          ──>   solar, pota, sota, iota, wspr, omiss,
