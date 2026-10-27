@@ -545,11 +545,14 @@ workflow rather than designing its own.
 |---|---|---|
 | Windows | Microsoft: Azure Trusted Signing | the installer on GitHub Releases |
 | macOS | Apple: Developer ID, and notarized | the dmg and zip on GitHub Releases |
-| Linux RPM and DEB | KI7MT's code-signing key, through a signing-only subkey | our own signed `dnf` and `apt` repositories on Cloudflare R2, `packages.qso-graph.io` |
+| Linux RPM and DEB | a release key, vouched for by KI7MT's code-signing key | our own signed `dnf` and `apt` repositories on Cloudflare R2, `packages.qso-graph.io` |
 
-- **The Linux key** is `C177 6630 7115 78FE 9A2B  9F7F 18C0 F6B7 0DA2 F991` ("Greg Beam (CODE SIGNING KEY)", RSA 4096).
-  CI holds only a signing-only subkey, in a GitHub secret; the master key never leaves KI7MT's machine. Users are
-  always shown the full fingerprint, never a short ID.
+- **The Linux keys are laid out like a certificate authority's.** The root is KI7MT's code-signing key,
+  `C177 6630 7115 78FE 9A2B  9F7F 18C0 F6B7 0DA2 F991` ("Greg Beam (CODE SIGNING KEY)", RSA 4096). It is never
+  changed and never leaves his machine. Packages are signed by a release key ("QSO Graph Releases", RSA 4096,
+  a 10-year life) that the root has signed. CI holds only the release key, in a GitHub secret. It's revoked only
+  if compromised, because key history is credibility. Users are always shown the full fingerprint, never a short
+  ID.
 - **Not COPR or Launchpad:** both build from source in a sandbox (Launchpad with no network), which an npm/Electron
   build can't do. The AppImage ships alongside, and updates itself.
 - **R2** serves the repositories as static files with no charge for downloads. Packages are uploaded before the signed
