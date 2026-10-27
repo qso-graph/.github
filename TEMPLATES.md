@@ -536,6 +536,26 @@ whatever its base — see *Never*, above, for why that trigger carries no branch
 
 ---
 
+## Electron apps: the standard release
+
+Every Electron-based app in this org releases the same way (KI7MT, 2026-10-27). A new app copies QSO Graph Desktop's
+workflow rather than designing its own.
+
+| Platform | Signed by | Shipped through |
+|---|---|---|
+| Windows | Microsoft: Azure Trusted Signing | the installer on GitHub Releases |
+| macOS | Apple: Developer ID, and notarized | the dmg and zip on GitHub Releases |
+| Linux RPM and DEB | KI7MT's code-signing key, through a signing-only subkey | our own signed `dnf` and `apt` repositories on Cloudflare R2, `packages.qso-graph.io` |
+
+- **The Linux key** is `C177 6630 7115 78FE 9A2B  9F7F 18C0 F6B7 0DA2 F991` ("Greg Beam (CODE SIGNING KEY)", RSA 4096).
+  CI holds only a signing-only subkey, in a GitHub secret; the master key never leaves KI7MT's machine. Users are
+  always shown the full fingerprint, never a short ID.
+- **Not COPR or Launchpad:** both build from source in a sandbox (Launchpad with no network), which an npm/Electron
+  build can't do. The AppImage ships alongside, and updates itself.
+- **R2** serves the repositories as static files with no charge for downloads. Packages are uploaded before the signed
+  metadata, so an index never names a file that isn't there yet.
+- The first implementation is [qso-graph-desktop#113](https://github.com/qso-graph/qso-graph-desktop/issues/113).
+
 ## Registry-publish job
 
 **Purpose**: after a successful PyPI publish (the release run, started from Actions on `main`), publish the same version to the [Official MCP Registry](https://registry.modelcontextprotocol.io)
