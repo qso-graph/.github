@@ -6,7 +6,7 @@
 
 **Open amateur radio software, built to work together.**
 
-QSO Graph is open amateur radio software for your station: logging, nets, awards, spots and your radio, in one place, on Windows, macOS and Linux, with the libraries and AI integrations behind them. **Today** that is the MCP servers and the libraries under them; **QSO Graph Desktop**, the app that brings it together, has its first releases. They share one data model, publish their interfaces, and are built so that any of them can be used alone. Free software under the GPL, for individual operators and for clubs, small and large.
+QSO Graph is open amateur radio software for your station: logging, nets, awards, spots and your radio, in one place, on Windows, macOS and Linux, with the libraries and AI integrations behind them. **Today** that is the MCP servers and the libraries under them; **QSO Graph Desktop**, the app that brings it together, is released: 0.4.0 is the Stable release on Windows, Linux and macOS. They share one data model, publish their interfaces, and are built so that any of them can be used alone. Free software under the GPL, for individual operators and for clubs, small and large.
 
 **[View the live demo →](https://qso-graph.io/qso-graph-demo-logbook/)** · **[Documentation →](https://qso-graph.io)**
 
@@ -20,16 +20,18 @@ QSO Graph is open amateur radio software for your station: logging, nets, awards
 
 | Product | What it is | Status |
 |:--------|:-----------|:-------|
-| **[QSO Graph Desktop](https://github.com/qso-graph/qso-graph-desktop)** | One app for your station on Windows, macOS and Linux: your logbook, nets, awards, spots and your radio, with your callsigns and logins kept in your own OS keyring | **Early releases** ([latest](https://github.com/qso-graph/qso-graph-desktop/releases/latest)), growing milestone by milestone |
-| **[QSO Graph SDK](https://github.com/qso-graph/qso-graph-sdk)** (QGSDK) | The build kit: pick what you work on (QSO Graph Desktop or the MCP servers) and get exactly its tools, pinned, with one command on Windows, Linux or macOS, so anyone can build them | **Available** ([latest](https://github.com/qso-graph/qso-graph-sdk/releases/latest)) |
+| **[QSO Graph Desktop](https://github.com/qso-graph/qso-graph-desktop)** | A desktop home for your station on Windows, Linux and macOS: your callsigns and their logins (kept in your own OS credential store), your Locations, Parks On the Air, band conditions, the sun and moon, and ADIF Lookup, each an extension. Integrations with WSJT-X and the programs you already run come next. Signed downloads, a signed apt/dnf repository, and Homebrew | **Available** ([0.4.0](https://github.com/qso-graph/qso-graph-desktop/releases/latest)), growing milestone by milestone |
+| **[QSO Graph SDK](https://github.com/qso-graph/qso-graph-sdk)** (QGSDK) | The build kit: pick what you work on (QSO Graph Desktop, the Qt logger or the MCP servers) and get exactly its tools, pinned, with one command on Windows, Linux or macOS, so anyone can build them | **Available** ([latest](https://github.com/qso-graph/qso-graph-sdk/releases/latest)) |
 
-Earlier plans for a separate net logger, an ADIF service and a self-hosted club server are folded into it.
+Earlier plans for a separate net logger, an ADIF service and a self-hosted club server are folded into QSO Graph Desktop.
+
+For developers: [qso-graph-sim](https://github.com/qso-graph/qso-graph-sim) replays a program's network messages from its own log (WSJT-X first), so integrations can be tested without a radio, and the [Homebrew tap](https://github.com/qso-graph/homebrew-tap) carries QSO Graph Desktop's Stable releases for macOS.
 
 Products are linked here as each becomes public.
 
 **In order:**
 
-1. **Now: one app for the station, built properly.** QSO Graph Desktop, to enterprise security standards; its first releases are out.
+1. **Now: one app for the station, built properly.** QSO Graph Desktop, to enterprise security standards; 0.4.0 is the Stable release.
 2. **With it: the clubs with nothing.** Club rosters, nets and awards for the many clubs and nets that have no software or server of their own.
 3. **Then: publish the seams.** The interfaces between the pieces become published specifications that anyone can implement, including software that isn't ours.
 4. **Eventually: governance that isn't us.** Clubs, small and large with an equal voice, steering the parts that affect them, through the specifications.
