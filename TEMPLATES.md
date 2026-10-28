@@ -816,6 +816,24 @@ Repos that also test Windows or macOS keep their `os` matrix.
 
 ---
 
+## The command is the package name
+
+A package's console script is named after the package, so `uv tool install <pkg>` gives you a
+command called `<pkg>`. A second command is allowed if it is prefixed by the package name or by its
+**stem**: the name with its role suffix (`-mcp`, `-client`, `-auth`, `-sim`) removed. So `ionis-mcp`
+may ship `ionis-download`, and `qsp-client` may ship `qsp-adif-convert`.
+
+The stem is **not** the first hyphen-separated segment. `"qso-graph-auth".split("-")[0]` is `"qso"`,
+which would accept `qso-auth`: the exact defect this rule exists to prevent (qso-graph-auth#28).
+
+A renamed command keeps its old name as a deprecated alias pointing at a **separate entry point**
+that prints a notice to **stderr** and then calls the real one, returning its exit status unchanged.
+Add the old name to `DEPRECATED` in `tests/test_packaging.py`. Removal is a later release, announced
+in the CHANGELOG.
+
+Assert it. `tests/test_packaging.py` reads `pyproject.toml` and checks every declared script, because
+this was a convention nobody asserted, and it drifted.
+
 ## MCP protocol conformance
 
 A qso-graph MCP server must be valid against the **Model Context Protocol specification**, not only
