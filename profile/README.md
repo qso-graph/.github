@@ -67,7 +67,7 @@ Then your MCP client runs each server with `uvx`, always the current release:
 "command": "uvx", "args": ["solar-mcp"]
 ```
 
-Command-line tools install with `uv tool install`: `qso-graph-auth` (credentials, the `qso-auth` command) and `qsp-client` (the local-LLM relay). Client configs for Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code and Gemini CLI: [Getting Started](https://qso-graph.io/getting-started/).
+Command-line tools install with `uv tool install`: `qso-graph-auth` (credentials) and `qsp-client` (the local-LLM relay). Client configs for Claude Desktop, Claude Code, ChatGPT, Cursor, VS Code and Gemini CLI: [Getting Started](https://qso-graph.io/getting-started/).
 
 ### Security — Our #1 Priority
 
@@ -94,7 +94,7 @@ Full details: [Security](https://qso-graph.io/security/)
 | Package | Purpose | Status |
 |:--------|:--------|:-------|
 | [adif-mcp](https://github.com/qso-graph/adif-mcp) | ADIF 3.1.7 spec parsing, validation, enumerations (8 tools) | [![PyPI](https://img.shields.io/pypi/v/adif-mcp?label=PyPI&color=blue)](https://pypi.org/project/adif-mcp/) |
-| [qso-graph-auth](https://github.com/qso-graph/qso-graph-auth) | Persona management, OS keyring credentials, `qso-auth` CLI | [![PyPI](https://img.shields.io/pypi/v/qso-graph-auth?label=PyPI&color=blue)](https://pypi.org/project/qso-graph-auth/) |
+| [qso-graph-auth](https://github.com/qso-graph/qso-graph-auth) | Persona management, OS keyring credentials, `qso-graph-auth` CLI | [![PyPI](https://img.shields.io/pypi/v/qso-graph-auth?label=PyPI&color=blue)](https://pypi.org/project/qso-graph-auth/) |
 
 #### Logbook Services (Authenticated)
 
@@ -189,7 +189,7 @@ Each server works with any MCP client: Claude Desktop, Claude Code, ChatGPT, Cur
 qso-graph-auth (identity)       MCP Servers (qso-graph)
  ├── PersonaManager        ──>   eqsl-mcp, qrz-mcp, lotw-mcp, hamqth-mcp
  ├── OS keyring credentials      Each server = 1 uvx
- └── qso-auth CLI                Each server = 5-14 MCP tools
+ └── qso-graph-auth CLI          Each server = 5-14 MCP tools
 
 adif-mcp (ADIF spec)            Public Servers
  └── 8 spec tools          ──>   solar, pota, sota, iota, wspr, omiss,
