@@ -559,6 +559,28 @@ workflow rather than designing its own.
   metadata, so an index never names a file that isn't there yet.
 - The first implementation is [qso-graph-desktop#113](https://github.com/qso-graph/qso-graph-desktop/issues/113).
 
+## Signing: the same identities for every binary
+
+Every QSO Graph binary on every platform is signed with the same identities (KI7MT, 2026-11-03: "Same certs,
+everywhere"): Gregory Beam through the one Azure Artifact Signing account on Windows, Greg Beam's Developer ID
+on macOS, the release key above on Linux. Programs and libraries that aren't Electron apps (`qgt`, the `-ffi`
+libraries, QG Rig and QG UDP) are signed by shared workflows here, called from each repo's release workflow:
+
+| Workflow | Does | Needs, in the calling repo |
+|---|---|---|
+| `sign-windows.yml` | Signs every `.exe` and `.dll`, then checks each is Valid and signed by CN=Gregory Beam | a `windows-signing` Environment (branch rule: main) with `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, and Azure trusting that Environment |
+| `sign-macos.yml` | Signs every Mach-O file with the hardened runtime and a timestamp, notarizes them, checks each signature | a `macos-signing` Environment (branch rule: main) with `CSC_LINK`, `CSC_KEY_PASSWORD`, `APPLE_API_KEY_P8`, `APPLE_API_KEY_ID`, `APPLE_API_ISSUER`, `APPLE_TEAM_ID` |
+| `release-attest.yml` | Gathers the signed files, writes `SHA256SUMS.txt`, attests every file | nothing |
+
+The secret names are QSO Graph Desktop's, so its Environments show what goes where. Electron apps keep
+electron-builder's signing inside the build (above), with the same Environments.
+
+**Shared, and still isolated.** The note at the end of this file prefers a copy in each repo for publishing,
+because a change to a shared workflow would reach every repo at once. These are called pinned to a commit
+(`uses: qso-graph/.github/.github/workflows/sign-macos.yml@<sha>`), so a change here reaches a repo only when that
+repo's own pull request moves the pin. The steps that hold a key are then written once, not copied and left to
+drift. Tracked in [qso-graph/.github#47](https://github.com/qso-graph/.github/issues/47).
+
 ## Registry-publish job
 
 **Purpose**: after a successful PyPI publish (the release run, started from Actions on `main`), publish the same version to the [Official MCP Registry](https://registry.modelcontextprotocol.io)
