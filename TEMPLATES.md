@@ -2,8 +2,8 @@
 
 Canonical snippets that every qso-graph MCP repo copies into its own
 `.github/workflows/*.yml` files. Each repo holds an independent copy
-(per-repo isolation; see Patton's review note 2026-05-16 on the
-version-drift architecture). When a template changes, every copy is
+(per-repo isolation, so a template change cannot drift every repo at
+once). When a template changes, every copy is
 updated explicitly by a PR per repo.
 
 This file is **the** source of truth. If you change a workflow in a
@@ -13,10 +13,10 @@ single repo, update this file first and propagate.
 
 ## How we develop and release (every qso-graph repo)
 
-KI7MT, 2026-10-25. **One working branch, and a release is a button.** Merging publishes
+Decided 2026-10-25 by KI7MT. **One working branch, and a release is a button.** Merging publishes
 nothing; `publish.yml` fires on `workflow_dispatch` with the version typed in.
 
-> **This replaced Git Flow (KI7MT, 2026-10-06), and the reason is worth keeping.** Under that
+> **This replaced Git Flow (2026-10-06), and the reason is worth keeping.** Under that
 > flow `publish.yml` triggered on a push to `main`, so *merging the release PR was the act of
 > publishing*. That forced **two pull requests for every release** — one to prepare the version
 > on `develop`, a second to merge `develop` into `main` and ship it. All 22 server repositories
@@ -96,7 +96,7 @@ under `[Unreleased]` and counts toward its milestone; it needs no release of its
 ## A release is done when it's published everywhere
 
 **A release is complete only when PyPI and the Official MCP Registry
-both serve the new version** (KI7MT, 2026-09-28). A PyPI release alone is
+both serve the new version**. A PyPI release alone is
 half a release.
 
 `publish.yml` runs on **`workflow_dispatch`** — a person pressing Run workflow — and enforces
@@ -143,7 +143,7 @@ which is how it was chosen as canonical rather than by picking one.
 ```yaml
 name: Publish to PyPI
 
-# A release happens on purpose, not as a side effect of merging (KI7MT, 2026-10-25).
+# A release happens on purpose, not as a side effect of merging.
 #
 # This used to fire on a push to `main`, which made "merge the release PR" the act of
 # publishing — and that is what forced two pull requests per release: one to prepare the
@@ -538,7 +538,7 @@ whatever its base — see *Never*, above, for why that trigger carries no branch
 
 ## Electron apps: the standard release
 
-Every Electron-based app in this org releases the same way (KI7MT, 2026-10-27). A new app copies QSO Graph Desktop's
+Every Electron-based app in this org releases the same way. A new app copies QSO Graph Desktop's
 workflow rather than designing its own.
 
 | Platform | Signed by | Shipped through |
@@ -561,8 +561,7 @@ workflow rather than designing its own.
 
 ## Signing: the same identities for every binary
 
-Every QSO Graph binary on every platform is signed with the same identities (KI7MT, 2026-11-03: "Same certs,
-everywhere"): Gregory Beam through the one Azure Artifact Signing account on Windows, Greg Beam's Developer ID
+Every QSO Graph binary on every platform is signed with the same identities: Gregory Beam through the one Azure Artifact Signing account on Windows, Greg Beam's Developer ID
 on macOS, the release key above on Linux. Programs and libraries that aren't Electron apps (`qgt`, the `-ffi`
 libraries, QG Rig and QG UDP) are signed by shared workflows here, called from each repo's release workflow:
 
@@ -651,10 +650,10 @@ that reads the `version` field from the first matching Registry entry.
 
 ### Honest framing
 
-The 2026-05-16 rollout used **forward-only sync** (per Patton's review):
+The 2026-05-16 rollout used **forward-only sync**:
 Registry entries were left stale until each server's next real release.
 That left every server behind for months, with nothing failing
-(2026-09-28). **Superseded (KI7MT, 2026-09-28):** every MCP is brought up
+(2026-09-28). **Superseded 2026-09-28:** every MCP is brought up
 to date in one sweep, each release carrying the real changes of the sweep
 (README layout, `server.json`, the release gates), and from then on the
 `verify` job keeps PyPI and the Registry in step. The badges stay as a
@@ -769,7 +768,7 @@ permissions:
 
 jobs:
   # Lint and types, once rather than per Python: both read the source, and
-  # neither answer changes with the interpreter running them (qso-graph-devel#66).
+  # neither answer changes with the interpreter running them.
   lint:
     name: ruff and mypy
     runs-on: ubuntu-latest
@@ -886,8 +885,7 @@ them as untrusted.
 **Protocol revision currency is a dependency decision**, tracked once for the fleet. Do not hand-roll
 protocol features the installed `fastmcp`/`mcp` does not implement.
 
-See `qso-graph-devel/planning/MCP-SECURITY-FRAMEWORK.md` for the full section, and the specification at
-https://modelcontextprotocol.io/specification/latest.
+The specification: https://modelcontextprotocol.io/specification/latest.
 
 ---
 
@@ -925,6 +923,6 @@ In this order. Settings first, so nothing can be deleted or squashed while the r
 - `mcp-publisher` source: https://github.com/modelcontextprotocol/registry
 - Publishing quickstart: https://github.com/modelcontextprotocol/registry/blob/main/docs/modelcontextprotocol-io/quickstart.mdx
 - GitHub Actions guide: https://github.com/modelcontextprotocol/registry/blob/main/docs/modelcontextprotocol-io/github-actions.mdx
-- Patton's architecture review (2026-05-16 inbox): per-repo copy preferred over shared workflow — same logic as `ci.yml` decision; publish workflows have higher consequence so isolation matters more
+- Per-repo copy over a shared publish workflow: the same reasoning as `ci.yml`, and a publish workflow's mistakes cost more, so isolation matters more
 - `mcp.so` sync: pulls from the Official Registry on its own cadence; no separate publish step needed (verify periodically)
 - Anthropic Connector List: separate manual-review process (not in scope for this automation)
