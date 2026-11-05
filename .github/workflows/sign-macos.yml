@@ -1,0 +1,146 @@
+name: Sign for macOS
+
+# Signs and notarizes a release's macOS programs and libraries (Mach-O files:
+# command-line tools, .dylib) with QSO Graph's Developer ID, the same identity QSO
+# Graph Desktop signs with (qso-graph/.github#47). Called by a product
+# repository's release workflow:
+#
+#   sign-macos:
+#     needs: build
+#     uses: qso-graph/.github/.github/workflows/sign-macos.yml@<commit>
+#     with: { artifact: qgt-macos-unsigned, signed: qgt-macos }
+#     secrets: inherit
+#
+# The caller's macos-signing Environment holds the certificate (CSC_LINK,
+# CSC_KEY_PASSWORD) and the notary key (APPLE_API_KEY_P8, APPLE_API_KEY_ID,
+# APPLE_API_ISSUER, APPLE_TEAM_ID), under the names QSO Graph Desktop uses. Its
+# branch rule (main) is the lock; this workflow also refuses any other ref.
+#
+# An app bundle is not signed here: electron-builder signs an app from the inside
+# out as it builds it (QSO Graph Desktop's ci.yml), with the same Environment.
+
+on:
+  workflow_call:
+    inputs:
+      artifact:
+        description: The unsigned files, as an Actions artifact uploaded by the caller
+        type: string
+        required: true
+      signed:
+        description: The artifact name to upload the signed files under
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  sign:
+    name: Sign and notarize (macOS)
+    runs-on: macos-latest
+    # Apple's notarization queue decides how long; usually minutes.
+    timeout-minutes: 60
+    environment: macos-signing
+    steps:
+      - name: Only main signs
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          [ "$REF" = refs/heads/main ] || { echo "Signing runs from main only, not $REF." >&2; exit 1; }
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ${{ inputs.artifact }}
+          path: files
+
+      # The secrets reach this step and no other. The keychain and the notary key
+      # live in the runner's temporary folder, removed with the runner.
+      - name: Sign and notarize
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          for name in CSC_LINK CSC_KEY_PASSWORD APPLE_API_KEY_P8 APPLE_API_KEY_ID APPLE_API_ISSUER APPLE_TEAM_ID; do
+            [ -n "${!name}" ] || { echo "The macos-signing Environment has no $name." >&2; exit 1; }
+          done
+          # Each secret's shape, said plainly, never its value (QSO Graph Desktop's checks).
+          [[ "$APPLE_API_KEY_ID" =~ ^[A-Z0-9]{10}$ ]] || { echo "APPLE_API_KEY_ID should be the 10-character Key ID (the part after AuthKey_ in the .p8's name)." >&2; exit 1; }
+          [[ "$APPLE_TEAM_ID" =~ ^[A-Z0-9]{10}$ ]] || { echo "APPLE_TEAM_ID should be the 10-character Team ID." >&2; exit 1; }
+          [[ "$APPLE_API_ISSUER" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]] || { echo "APPLE_API_ISSUER should be the Issuer ID, a UUID." >&2; exit 1; }
+          [[ "$APPLE_API_KEY_P8" == *"-----BEGIN PRIVATE KEY-----"*"-----END PRIVATE KEY-----"* ]] || { echo "APPLE_API_KEY_P8 should be the whole .p8 file, BEGIN and END lines included." >&2; exit 1; }
+
+          # A keychain of this run's own, with a random password, as QSO Graph Desktop
+          # makes one; Apple's Developer ID G2 intermediate beside the certificate.
+          keychain="$RUNNER_TEMP/qg-signing.keychain-db"
+          keychain_password=$(openssl rand -base64 32)
+          echo "::add-mask::$keychain_password"
+          p12="$RUNNER_TEMP/qg-signing.p12"
+          printf '%s' "$CSC_LINK" | tr -d ' \r\n' | base64 --decode > "$p12"
+          unset CSC_LINK
+          curl --proto '=https' --tlsv1.2 -fsSL -o "$RUNNER_TEMP/DeveloperIDG2CA.cer" https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$RUNNER_TEMP/DeveloperIDG2CA.cer" -k "$keychain"
+          security import "$p12" -k "$keychain" -P "$CSC_KEY_PASSWORD" -T /usr/bin/codesign
+          unset CSC_KEY_PASSWORD
+          rm -f "$p12"
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$keychain_password" "$keychain" >/dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          identity="Developer ID Application: Greg Beam (${APPLE_TEAM_ID})"
+          security find-identity -v -p codesigning "$keychain" | grep -F "\"$identity\"" \
+            || { echo "The certificate is not \"$identity\"." >&2; exit 1; }
+
+          # Every Mach-O file: signed with the hardened runtime and a secure
+          # timestamp, both of which notarization requires. None is a failure.
+          files=()
+          while IFS= read -r -d '' f; do
+            file -b "$f" | grep -q '^Mach-O' && files+=("$f")
+          done < <(find files -type f -print0)
+          [ "${#files[@]}" -gt 0 ] || { echo "No Mach-O file in the artifact: nothing was signed." >&2; exit 1; }
+          for f in "${files[@]}"; do
+            codesign --force --timestamp --options runtime --sign "$identity" --keychain "$keychain" "$f"
+            echo "signed: ${f#files/}"
+          done
+
+          # Notarized: Apple takes a zip of the signed files and answers Accepted
+          # or Invalid. A bare program or library cannot carry a stapled ticket,
+          # so Gatekeeper asks Apple online the first time it runs.
+          key="$RUNNER_TEMP/AuthKey_${APPLE_API_KEY_ID}.p8"
+          printf '%s\n' "$APPLE_API_KEY_P8" > "$key"
+          chmod 600 "$key"
+          unset APPLE_API_KEY_P8
+          ditto -c -k --keepParent files "$RUNNER_TEMP/notarize.zip"
+          xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" --key "$key" --key-id "$APPLE_API_KEY_ID" \
+            --issuer "$APPLE_API_ISSUER" --wait --timeout 50m --output-format json > "$RUNNER_TEMP/notary.json"
+          rm -f "$key" "$RUNNER_TEMP/notarize.zip"
+          status=$(plutil -extract status raw "$RUNNER_TEMP/notary.json" 2>/dev/null || jq -r .status "$RUNNER_TEMP/notary.json")
+          echo "notarization: $status ($(jq -r .id "$RUNNER_TEMP/notary.json"))"
+          [ "$status" = Accepted ] || { echo "Apple did not accept the notarization: $status." >&2; exit 1; }
+
+      # What macOS will say: each file signed by Greg Beam's Developer ID, under the
+      # hardened runtime, and the signature intact.
+      - name: Signatures
+        run: |
+          set -euo pipefail
+          bad=0
+          while IFS= read -r -d '' f; do
+            file -b "$f" | grep -q '^Mach-O' || continue
+            if codesign --verify --strict --verbose=2 "$f" 2>&1 && codesign -dv --verbose=2 "$f" 2>&1 | grep -q '^Authority=Developer ID Application: Greg Beam ('; then
+              codesign -dv --verbose=2 "$f" 2>&1 | grep -E '^(Authority=Developer ID Application|TeamIdentifier|Runtime Version)' | sed "s|^|${f#files/}: |"
+            else
+              echo "::error::${f#files/} is not signed by Greg Beam's Developer ID"; bad=$((bad + 1))
+            fi
+          done < <(find files -type f -print0)
+          [ "$bad" -eq 0 ] || { echo "$bad file(s) not signed as they must be." >&2; exit 1; }
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ inputs.signed }}
+          path: files
+          if-no-files-found: error

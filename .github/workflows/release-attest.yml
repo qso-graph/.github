@@ -1,0 +1,88 @@
+name: Checksums and provenance
+
+# The last step before a release is published: the signed files gathered into one
+# folder, SHA256SUMS.txt written over them, and GitHub's attestation made for each
+# file and for SHA256SUMS.txt, so a ham can check a download two ways
+# (qso-graph/.github#47):
+#
+#   sha256sum --check --ignore-missing SHA256SUMS.txt
+#   gh attestation verify <file> -R qso-graph/<repository>
+#
+# Called by a product repository's release workflow, after its signing jobs:
+#
+#   attest:
+#     needs: [sign-windows, sign-macos]
+#     uses: qso-graph/.github/.github/workflows/release-attest.yml@<commit>
+#     with: { artifacts: "qgt-windows,qgt-macos,qgt-linux", release: qgt-release }
+#
+# It holds no secret: the attestation is signed with GitHub's own token, through
+# Sigstore, as QSO Graph Desktop's release (#83).
+
+on:
+  workflow_call:
+    inputs:
+      artifacts:
+        description: The signed artifacts to release, by name, comma-separated
+        type: string
+        required: true
+      release:
+        description: The artifact name to upload the release's files under
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  attest:
+    name: Checksums and provenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - name: Only main releases
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          [ "$REF" = refs/heads/main ] || { echo "A release is made from main only, not $REF." >&2; exit 1; }
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: gathered
+      # Each named artifact, into one folder. A name that was not uploaded fails,
+      # so a platform cannot drop out of a release unnoticed.
+      - name: Gather
+        env:
+          ARTIFACTS: ${{ inputs.artifacts }}
+        run: |
+          set -euo pipefail
+          IFS=, read -ra names <<< "$ARTIFACTS"
+          [ "${#names[@]}" -gt 0 ] || { echo "No artifacts named." >&2; exit 1; }
+          mkdir release
+          for n in "${names[@]}"; do
+            [[ $n =~ ^[0-9A-Za-z._-]{1,80}$ ]] || { echo "Not an artifact name: $n" >&2; exit 1; }
+            [ -d "gathered/$n" ] || { echo "Artifact $n was not uploaded." >&2; exit 1; }
+            # Files only, at the release's top level; two with one name is a mistake.
+            while IFS= read -r -d '' f; do
+              b=$(basename "$f")
+              [ ! -e "release/$b" ] || { echo "Two files named $b." >&2; exit 1; }
+              cp -- "$f" "release/$b"
+            done < <(find "gathered/$n" -type f -print0)
+          done
+          [ -n "$(ls -A release)" ] || { echo "Nothing to release." >&2; exit 1; }
+
+      - name: SHA256SUMS.txt
+        run: (cd release && sha256sum -- * > SHA256SUMS.txt && cat SHA256SUMS.txt)
+
+      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: release/*
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ inputs.release }}
+          path: release
+          if-no-files-found: error
