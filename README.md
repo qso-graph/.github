@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 # QSO Graph: organization defaults
 
 This repository holds what every QSO Graph repository shares:
