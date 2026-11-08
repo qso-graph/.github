@@ -80,8 +80,13 @@ def docs_ok(paths: set[str]) -> bool:
     return True
 
 
+# Any way of installing with pip rather than uv: pip or pip3 install/uninstall, python -m pip, pipx.
+# Only `pip install` was matched until 2026-11, so `pipx install` and `pip uninstall` passed unseen.
+PIP = re.compile(r"\b(?:pip3?\s+(?:install|uninstall)|python3?\s+-m\s+pip|pipx)\b", re.I)
+
+
 def install_ok(paths: set[str], readme: str) -> bool:
-    return "pyproject.toml" not in paths or re.search(r"\bpip\s+install\b", readme, re.I) is None
+    return "pyproject.toml" not in paths or PIP.search(readme) is None
 
 
 def headings(text: str) -> set[str]:
