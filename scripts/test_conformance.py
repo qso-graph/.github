@@ -27,6 +27,13 @@ class RulesTest(unittest.TestCase):
         self.assertFalse(c.docs_ok({"docs/user/nested/index.md"}))
         self.assertFalse(c.docs_ok({"docs/user/archive.zip"}))
 
+    def test_declared_license(self):
+        self.assertTrue(c.declared_license_ok({"pyproject.toml": 'license = {text = "GPL-3.0-or-later"}'}))
+        self.assertTrue(c.declared_license_ok({"Cargo.toml": 'license = "GPL-3.0-or-later"', "package.json": '"license": "GPL-3.0-or-later",'}))
+        self.assertFalse(c.declared_license_ok({"Cargo.toml": 'license = "GPL-3.0-only"'}))
+        self.assertFalse(c.declared_license_ok({"package.json": '"license": "GPL-3.0-only",'}))
+        self.assertTrue(c.declared_license_ok({}))
+
     def test_install(self):
         self.assertFalse(c.install_ok({"pyproject.toml"}, "python -m pip install package"))
         self.assertTrue(c.install_ok({"pyproject.toml"}, "uvx package"))

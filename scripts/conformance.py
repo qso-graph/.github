@@ -93,6 +93,20 @@ def docs_ok(paths: set[str]) -> bool:
 PIP = re.compile(r"\b(?:pip3?|pipx)\b(?!-audit)|\bpython3?\s+-m\s+pip\b", re.I)
 
 
+# Every QSO Graph project is GPL-3.0-or-later; a manifest declaring anything else (GPL-3.0-only was
+# common until 2026-11) fails. Only the project's own manifests at the root are read.
+MANIFESTS = ("pyproject.toml", "Cargo.toml", "package.json")
+DECLARED = re.compile(r'"?license"?\s*[=:]\s*(?:\{\s*text\s*=\s*)?"([^"]+)"', re.I)
+
+
+def declared_license_ok(manifests: dict[str, str]) -> bool:
+    for text in manifests.values():
+        found = DECLARED.findall(text)
+        if found and any(value != "GPL-3.0-or-later" for value in found):
+            return False
+    return True
+
+
 def install_ok(paths: set[str], readme: str) -> bool:
     return "pyproject.toml" not in paths or PIP.search(readme) is None
 
@@ -201,7 +215,8 @@ def inspect(repo: dict, vale: str | None = None) -> tuple[str, dict, int]:
     checks = {
         "Topics": topics_ok(name, repo.get("topics", [])),
         "Description": bool((repo.get("description") or "").strip()),
-        "License": bool(license_data and (license_data.get("license") or {}).get("spdx_id") == "GPL-3.0"),
+        "License": bool(license_data and (license_data.get("license") or {}).get("spdx_id") == "GPL-3.0")
+        and declared_license_ok({m: content(m) for m in MANIFESTS if m in paths}),
         "Changelog": not released or "CHANGELOG.md" in paths,
         "README": "README.md" in paths,
         "Install": install_ok(paths, readme),
