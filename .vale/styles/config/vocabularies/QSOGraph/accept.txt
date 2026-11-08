@@ -1,0 +1,22 @@
+QSO
+QSL
+ADIF
+ADX
+Cabrillo
+LoTW
+TQSL
+eQSL
+QRZ
+POTA
+SOTA
+IOTA
+DXCC
+WSJT-X
+WSJT
+fldigi
+N1MM
+callsign
+grid square
+MCP
+uv
+uvx

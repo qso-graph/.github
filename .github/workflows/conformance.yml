@@ -18,6 +18,19 @@ jobs:
           python-version: "3.12"
       - name: Test the rules
         run: python -m unittest discover -s scripts -p 'test_*.py'
+      - name: Install Vale
+        run: |
+          version=3.26.0
+          archive="vale_${version}_Linux_64-bit.tar.gz"
+          # The archive's SHA-256, pinned here: a checksum fetched beside the archive would prove only
+          # that both came from the same place.
+          sha256=22aa69a556558e4a9dfc63c17030777383d8d3c48dcdfad655fa98e839d666ed
+          base="https://github.com/errata-ai/vale/releases/download/v${version}"
+          curl -fsSLO "$base/$archive"
+          echo "$sha256  $archive" | sha256sum --check --strict
+          tar -xzf "$archive" vale
+          sudo install -m 0755 vale /usr/local/bin/vale
+          vale sync
       - name: Report conformance
         env:
           GITHUB_TOKEN: ${{ github.token }}

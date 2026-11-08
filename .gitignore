@@ -1,2 +1,4 @@
 __pycache__/
 *.py[cod]
+.vale/styles/Google/
+.tmp-vale/
