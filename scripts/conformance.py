@@ -22,6 +22,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+from sync_agents import block_span, canonical_block
+
 ORG = "qso-graph"
 API = "https://api.github.com"
 SECTIONS = {f"qso-graph-{s}" for s in ("app", "mcp", "library", "tool", "infra")}
@@ -29,7 +31,7 @@ IMAGES = {".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".avif", ".ico"}
 BUG = {"Observed", "Reproduce", "Credentials"}
 FEATURE = {"Summary", "Credentials"}
 PR = {"Issues", "What changed", "Verification", "Credentials"}
-COLUMNS = ("Topics", "Description", "License", "Changelog", "README", "Install", "User docs", "Style", "Issue templates", "PR template", "Private reporting")
+COLUMNS = ("Topics", "Description", "License", "Changelog", "README", "Install", "User docs", "Style", "Agent guide", "Issue templates", "PR template", "Private reporting")
 
 
 def get_json(url: str):
@@ -86,7 +88,9 @@ def docs_ok(paths: set[str]) -> bool:
 
 # Any way of installing with pip rather than uv: pip or pip3 install/uninstall, python -m pip, pipx.
 # Only `pip install` was matched until 2026-11, so `pipx install` and `pip uninstall` passed unseen.
-PIP = re.compile(r"\b(?:pip3?\s+(?:install|uninstall)|python3?\s+-m\s+pip|pipx)\b", re.I)
+# A README never sends users to pip: any mention of pip, pip3 or pipx counts, since "installed with
+# pip instead?" is an instruction too; pip-audit (a security tool) is not an install method.
+PIP = re.compile(r"\b(?:pip3?|pipx)\b(?!-audit)|\bpython3?\s+-m\s+pip\b", re.I)
 
 
 def install_ok(paths: set[str], readme: str) -> bool:
@@ -95,6 +99,14 @@ def install_ok(paths: set[str], readme: str) -> bool:
 
 def headings(text: str) -> set[str]:
     return set(re.findall(r"(?m)^##\s+(.+?)\s*#*\s*$", text))
+
+
+def agent_guide_ok(data: bytes, block: bytes) -> bool:
+    try:
+        span = block_span(data)
+    except ValueError:
+        return False
+    return span is not None and data[span[0]:span[1]] == block
 
 
 def issue_labels(text: str) -> set[str]:
@@ -172,6 +184,7 @@ def inspect(repo: dict, vale: str | None = None) -> tuple[str, dict, int]:
         data = get_json(blobs[path]["url"])
         return base64.b64decode(data["content"]).decode("utf-8", errors="replace")
 
+    guide = base64.b64decode(get_json(blobs["AGENTS.md"]["url"])["content"]) if "AGENTS.md" in paths else b""
     readme = content("README.md") if "README.md" in paths else ""
     style_files = {}
     if vale:
@@ -194,6 +207,7 @@ def inspect(repo: dict, vale: str | None = None) -> tuple[str, dict, int]:
         "Install": install_ok(paths, readme),
         "User docs": docs_ok(paths),
         "Style": None if not vale else errors,
+        "Agent guide": agent_guide_ok(guide, canonical_block()),
         "Issue templates": issue_templates_ok(issues),
         "PR template": pr_templates_ok(prs),
         # SECURITY.md sends reporters to the repository's private vulnerability reporting, so it

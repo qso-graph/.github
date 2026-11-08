@@ -35,6 +35,9 @@ class RulesTest(unittest.TestCase):
                         "pip3 install package", "python3 -m pip install package"):
             self.assertFalse(c.install_ok({"pyproject.toml"}, planted), planted)
         self.assertTrue(c.install_ok({"pyproject.toml"}, "uv tool install package; uv add package"))
+        self.assertFalse(c.install_ok({"pyproject.toml"}, "Installed with pip instead? Use the command."))
+        self.assertFalse(c.install_ok({"pyproject.toml"}, "which `pip` installs with it"))
+        self.assertTrue(c.install_ok({"pyproject.toml"}, "CI runs pip-audit --strict."))
 
     def test_issue_forms(self):
         bug = "\n".join(f"      label: {label}" for label in c.BUG)
@@ -43,6 +46,14 @@ class RulesTest(unittest.TestCase):
         self.assertTrue(c.issue_templates_ok({"bug.yml": bug, "feature.yml": feature}))
         self.assertFalse(c.issue_templates_ok({"config.yml": "blank_issues_enabled: false"}))
         self.assertFalse(c.issue_templates_ok({"bug.yml": bug}))
+
+    def test_agent_guide(self):
+        block = c.canonical_block()
+        self.assertTrue(c.agent_guide_ok(b"# Guide\n" + block + b"\nOther text", block))
+        self.assertFalse(c.agent_guide_ok(b"", block))
+        self.assertFalse(c.agent_guide_ok(block.replace(b"credentials", b"secrets", 1), block))
+        self.assertFalse(c.agent_guide_ok(block + block, block))
+        self.assertFalse(c.agent_guide_ok(block.replace(b"\n", b"\r\n"), block))
 
     def test_pr_template(self):
         self.assertTrue(c.pr_templates_ok({}))

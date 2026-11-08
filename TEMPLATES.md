@@ -14,6 +14,7 @@ single repo, update this file first and propagate.
 ## What every public repository carries
 
 - **Site:** Public, non-archived repositories are on qso-graph.io; private and archived repositories never are.
+- **Agent guide:** Every public repository has an `AGENTS.md` opening with the shared block and a `CLAUDE.md` holding `@AGENTS.md`; `scripts/sync_agents.py` writes them.
 - **Topics:** Each repository has `qso-graph` and at least one section: `qso-graph-app`, `qso-graph-mcp`, `qso-graph-library`, `qso-graph-tool`, or `qso-graph-infra` (which is never combined with another). A repository that is more than one thing carries each (QG Trust is an application and a library); its page lives under the first in the order Applications, MCP Servers, Libraries, Tools, and the other sections link to it. Other topics are free.
 - **Sections:** Applications are qso-graph-desktop and qso-graph-trust; MCP servers are `qso-graph-mcp`; libraries are qso-graph-auth and qso-graph-lib; tools are qso-graph-sim, qsp-client, and qso-graph-sdk.
 - **Infrastructure:** homebrew-tap, qso-graph-desktop-updates, qso-graph-packages, qso-graph.github.io, .github, and demo repositories are `qso-graph-infra` and never shown as products.
@@ -710,12 +711,12 @@ We use [uv](https://docs.astral.sh/uv/), and we recommend it to users. Proposed 
 
 ### For users (README)
 
-**Install** — `uvx` first (runs without an install step, always the current release), `pip`
-second:
+**Install** — `uvx` (runs without an install step, always the current release), or
+`uv tool install` to keep the command on PATH; never `pip`:
 
 ```bash
-uvx <package>            # run it; nothing to install
-pip install <package>    # or install it into your own environment
+uvx <package>               # run it; nothing to install
+uv tool install <package>   # or keep the command on your PATH
 ```
 
 **MCP client config** — `uvx`, so there's no PATH to get right:
@@ -732,7 +733,7 @@ pip install <package>    # or install it into your own environment
 ```
 
 (VS Code uses `"servers"` instead of `"mcpServers"`.) Add one line after the configs: *installed
-with pip? use `"command": "<package>"` instead.* Servers that need environment variables keep
+with `uv tool install`? use `"command": "<package>"` instead.* Servers that need environment variables keep
 their `"env"` block.
 
 Command-line tools (`qso-auth`, `ionis-download`): `uv tool install <package>`, which puts the
