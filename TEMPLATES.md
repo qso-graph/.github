@@ -19,11 +19,16 @@ single repo, update this file first and propagate.
 - **Infrastructure:** homebrew-tap, qso-graph-desktop-updates, qso-graph-packages, qso-graph.github.io, .github, and demo repositories are `qso-graph-infra` and never shown as products.
 - **Metadata:** Each repository has a description and a GPL-3.0 `LICENSE`; repositories with a GitHub Release have a `CHANGELOG.md`.
 - **README:** `README.md` is the product page: what it is, who it is for, what it does, installation, and first use; design notes, caveats and work in progress belong in `SECURITY.md`, `AGENTS.md` or `docs/`.
+- **Style:** Write user-facing text in `README.md` and `docs/user/` in American English, following the [Google Developer Documentation Style Guide](https://developers.google.com/style) and checking it with [Vale](https://vale.sh) and its Google package.
 - **User documentation:** The README is the index; `docs/user/` contains only Markdown and images, with no `index.md`; all other `docs/` content is for developers and never shown on the site.
 - **Releases:** The site shows each product at its latest GitHub Release, so updating its documentation requires a release.
 - **Installation:** Python packages are installed and run with uv, never `pip install` in a README; use `uvx`, `uv add`, or `uv tool install` as appropriate (see [the uv section](#uv-how-every-qso-graph-repo-is-installed-run-and-developed)). Native apps describe their own installers.
 - **Security reports:** private vulnerability reporting is on, since `SECURITY.md` sends reporters there.
 - **Community files:** Issue templates, the pull request template, `SECURITY.md`, and `CONTRIBUTING.md` inherit this repository's defaults unless a repository needs its own; a repository's own versions keep the core headings (bug: Observed, Reproduce, Credentials; feature: Summary, Credentials; pull request: Issues, What changed, Verification, Credentials) and may add fields of their own.
+
+### House terms
+
+Use ham-radio words and names as their owners write them: QSO, QSL, ADIF, ADX, Cabrillo, LoTW, TQSL, eQSL, QRZ, POTA, SOTA, IOTA, DXCC, WSJT-X, fldigi, N1MM, MCP, uv, and uvx. Write callsign as one word and use grid square. Use QSO as a noun.
 
 ## How we develop and release (every qso-graph repo)
 

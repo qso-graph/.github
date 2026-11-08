@@ -4,6 +4,15 @@ import conformance as c
 
 
 class RulesTest(unittest.TestCase):
+    def test_vale_json_counts_severities_across_files(self):
+        sample = '''{
+          "README.md": [{"Severity": "error"}, {"Severity": "warning"}, {"Severity": "suggestion"}],
+          "docs/user/guide.md": [{"Severity": "error"}, {"Severity": "warning"}, {"Severity": "warning"}],
+          "docs/user/empty.md": []
+        }'''
+        self.assertEqual(c.parse_vale_output(sample), (2, 3))
+        self.assertEqual(c.parse_vale_output("{}"), (0, 0))
+
     def test_topics(self):
         self.assertTrue(c.topics_ok("qso-graph-desktop", ["qso-graph", "qso-graph-app", "radio"]))
         self.assertFalse(c.topics_ok("qso-graph-desktop", ["qso-graph", "qso-graph-mcp"]))

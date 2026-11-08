@@ -11,9 +11,12 @@ import base64
 from concurrent.futures import ThreadPoolExecutor
 import json
 import os
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -26,7 +29,7 @@ IMAGES = {".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".avif", ".ico"}
 BUG = {"Observed", "Reproduce", "Credentials"}
 FEATURE = {"Summary", "Credentials"}
 PR = {"Issues", "What changed", "Verification", "Credentials"}
-COLUMNS = ("Topics", "Description", "License", "Changelog", "README", "Install", "User docs", "Issue templates", "PR template", "Private reporting")
+COLUMNS = ("Topics", "Description", "License", "Changelog", "README", "Install", "User docs", "Style", "Issue templates", "PR template", "Private reporting")
 
 
 def get_json(url: str):
@@ -111,7 +114,42 @@ def repositories() -> list[dict]:
         page += 1
 
 
-def inspect(repo: dict) -> tuple[str, dict[str, bool]]:
+def parse_vale_output(output: str) -> tuple[int, int]:
+    """Count error and warning alerts in Vale's JSON output."""
+    alerts = json.loads(output)
+    errors = warnings = 0
+    for file_alerts in alerts.values():
+        for alert in file_alerts:
+            severity = alert["Severity"].lower()
+            errors += severity == "error"
+            warnings += severity == "warning"
+    return errors, warnings
+
+
+def check_style(files: dict[str, str], vale: str) -> tuple[int, int]:
+    if not files:
+        return 0, 0
+    config = Path(__file__).resolve().parent.parent / ".vale.ini"
+    with tempfile.TemporaryDirectory(prefix="qso-graph-vale-") as directory:
+        root = Path(directory)
+        for index, (name, text) in enumerate(files.items()):
+            # Vale discovers lowercase .md files; normalize other Markdown extensions.
+            target = root / str(index) / (PurePosixPath(name).stem + ".md")
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(text, encoding="utf-8")
+        result = subprocess.run(
+            [vale, "--config", str(config), "--output=JSON", str(root)],
+            capture_output=True, text=True, encoding="utf-8", check=False,
+        )
+        if result.returncode not in (0, 1):
+            raise RuntimeError(f"Vale failed: {result.stderr.strip()}")
+        try:
+            return parse_vale_output(result.stdout)
+        except (ValueError, KeyError, TypeError) as error:
+            raise RuntimeError(f"Invalid Vale output: {result.stderr.strip()}") from error
+
+
+def inspect(repo: dict, vale: str | None = None) -> tuple[str, dict, int]:
     name = repo["name"]
     base = f"{API}/repos/{ORG}/{urllib.parse.quote(name, safe='')}"
     branch = urllib.parse.quote(repo["default_branch"], safe="")
@@ -126,6 +164,12 @@ def inspect(repo: dict) -> tuple[str, dict[str, bool]]:
         return base64.b64decode(data["content"]).decode("utf-8", errors="replace")
 
     readme = content("README.md") if "README.md" in paths else ""
+    style_files = {}
+    if vale:
+        if "README.md" in paths:
+            style_files["README.md"] = readme
+        style_files.update({p: content(p) for p in sorted(paths) if p.startswith("docs/user/") and PurePosixPath(p).suffix.lower() == ".md"})
+    errors, warnings = check_style(style_files, vale) if vale else (0, 0)
     issues = {p: content(p) for p in paths if p.startswith(".github/ISSUE_TEMPLATE/") and PurePosixPath(p).suffix.lower() in {".md", ".yml", ".yaml"}}
 
     prs = {p: content(p) for p in paths if p.lower() in {"pull_request_template.md", "docs/pull_request_template.md", ".github/pull_request_template.md"} or p.lower().startswith(".github/pull_request_template/") and p.lower().endswith(".md")}
@@ -140,29 +184,42 @@ def inspect(repo: dict) -> tuple[str, dict[str, bool]]:
         "README": "README.md" in paths,
         "Install": install_ok(paths, readme),
         "User docs": docs_ok(paths),
+        "Style": None if not vale else errors,
         "Issue templates": issue_templates_ok(issues),
         "PR template": pr_templates_ok(prs),
         # SECURITY.md sends reporters to the repository's private vulnerability reporting, so it
         # must be switched on; the setting is readable on a public repository with no token.
         "Private reporting": bool((get_json(f"{base}/private-vulnerability-reporting") or {}).get("enabled")),
     }
-    return name, checks
+    return name, checks, warnings
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--strict", action="store_true", help="exit 10 if any rule fails")
     args = parser.parse_args()
+    vale = shutil.which("vale")
     with ThreadPoolExecutor(max_workers=6) as executor:
-        rows = list(executor.map(inspect, repositories()))
+        rows = list(executor.map(lambda repo: inspect(repo, vale), repositories()))
     print("| Repository | " + " | ".join(COLUMNS) + " | Failures |")
     print("|---|" + "---|" * (len(COLUMNS) + 1))
     failed = 0
-    for name, checks in rows:
-        bad = [column for column in COLUMNS if not checks[column]]
+    warning_count = 0
+    for name, checks, warnings in rows:
+        warning_count += warnings
+        bad = [column for column in COLUMNS
+               if (checks[column] is not None and checks[column] > 0)
+               if column == "Style"]
+        bad += [column for column in COLUMNS if column != "Style" and not checks[column]]
         failed += bool(bad)
-        print(f"| {name} | " + " | ".join("ok" if checks[c] else "FAIL" for c in COLUMNS) + " | " + (", ".join(bad) or "—") + " |")
+        def cell(column: str) -> str:
+            value = checks[column]
+            if column == "Style":
+                return "skipped" if value is None else f"{value} errors" if value else "ok"
+            return "ok" if value else "FAIL"
+        print(f"| {name} | " + " | ".join(cell(c) for c in COLUMNS) + " | " + (", ".join(bad) or "—") + " |")
     print(f"\n{failed} of {len(rows)} repositories have findings. Checks inspect the default branch; releases include prereleases.")
+    print(f"Style: {warning_count} warning alerts across all repositories; warnings do not fail the check." if vale else "Style: skipped because Vale is not on PATH.")
     return 10 if args.strict and failed else 0
 
 
