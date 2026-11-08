@@ -34,7 +34,11 @@ jobs:
       - name: Report conformance
         env:
           GITHUB_TOKEN: ${{ github.token }}
+        # Enforcing since every public repository conformed (2026-11-08): the table always reaches the
+        # job summary, then any finding fails the run (--strict exits 10), so drift shows as a red check.
         run: |
-          python scripts/conformance.py > report.md
+          status=0
+          python scripts/conformance.py --strict > report.md || status=$?
           cat report.md >> "$GITHUB_STEP_SUMMARY"
           cat report.md
+          exit "$status"
