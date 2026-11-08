@@ -1,0 +1,30 @@
+name: Feature request
+description: Something it should do, or do better.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What would you like it to do?
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What would it let you do that you can't today?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Anything you tried or considered instead.
+  - type: checkboxes
+    id: credentials
+    attributes:
+      label: Credentials
+      options:
+        - label: No password, key, token, certificate or private data appears in this issue or anything attached to it.
+          required: true

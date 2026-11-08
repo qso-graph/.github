@@ -1,0 +1,44 @@
+name: Bug report
+description: Something that is not working as it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never paste a password, API key, token, certificate, private key or a real log you would not
+        publish. Describe its shape instead, or use test data.
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed
+      description: What happened? Say what you saw and what you only suspect.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduce
+      description: The steps that make it happen.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+      description: What should have happened?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The version, and your operating system.
+    validations:
+      required: true
+  - type: checkboxes
+    id: credentials
+    attributes:
+      label: Credentials
+      options:
+        - label: No password, key, token, certificate or private data appears in this issue or anything attached to it.
+          required: true

@@ -11,6 +11,20 @@ single repo, update this file first and propagate.
 
 ---
 
+## What every public repository carries
+
+- **Site:** Public, non-archived repositories are on qso-graph.io; private and archived repositories never are.
+- **Topics:** Each repository has `qso-graph` and exactly one of `qso-graph-app`, `qso-graph-mcp`, `qso-graph-library`, `qso-graph-tool`, or `qso-graph-infra`; other topics are free.
+- **Sections:** Applications are qso-graph-desktop and qso-graph-trust; MCP servers are `qso-graph-mcp`; libraries are qso-graph-auth and qso-graph-lib; tools are qso-graph-sim, qsp-client, and qso-graph-sdk.
+- **Infrastructure:** homebrew-tap, qso-graph-desktop-updates, qso-graph-packages, qso-graph.github.io, .github, and demo repositories are `qso-graph-infra` and never shown as products.
+- **Metadata:** Each repository has a description and a GPL-3.0 `LICENSE`; repositories with a GitHub Release have a `CHANGELOG.md`.
+- **README:** `README.md` is the product page: what it is, who it is for, what it does, installation, and first use; design notes, caveats and work in progress belong in `SECURITY.md`, `AGENTS.md` or `docs/`.
+- **User documentation:** The README is the index; `docs/user/` contains only Markdown and images, with no `index.md`; all other `docs/` content is for developers and never shown on the site.
+- **Releases:** The site shows each product at its latest GitHub Release, so updating its documentation requires a release.
+- **Installation:** Python packages are installed and run with uv, never `pip install` in a README; use `uvx`, `uv add`, or `uv tool install` as appropriate (see [the uv section](#uv-how-every-qso-graph-repo-is-installed-run-and-developed)). Native apps describe their own installers.
+- **Security reports:** private vulnerability reporting is on, since `SECURITY.md` sends reporters there.
+- **Community files:** Issue templates, the pull request template, `SECURITY.md`, and `CONTRIBUTING.md` inherit this repository's defaults unless a repository needs its own; a repository's own versions keep the core headings (bug: Observed, Reproduce, Credentials; feature: Summary, Credentials; pull request: Issues, What changed, Verification, Credentials) and may add fields of their own.
+
 ## How we develop and release (every qso-graph repo)
 
 Decided 2026-10-25 by KI7MT. **One working branch, and a release is a button.** Merging publishes
