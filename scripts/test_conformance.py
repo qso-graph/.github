@@ -29,6 +29,10 @@ class RulesTest(unittest.TestCase):
         self.assertFalse(c.install_ok({"pyproject.toml"}, "python -m pip install package"))
         self.assertTrue(c.install_ok({"pyproject.toml"}, "uvx package"))
         self.assertTrue(c.install_ok(set(), "pip install package"))
+        for planted in ("pipx install package", "pip uninstall old && pip install new",
+                        "pip3 install package", "python3 -m pip install package"):
+            self.assertFalse(c.install_ok({"pyproject.toml"}, planted), planted)
+        self.assertTrue(c.install_ok({"pyproject.toml"}, "uv tool install package; uv add package"))
 
     def test_issue_forms(self):
         bug = "\n".join(f"      label: {label}" for label in c.BUG)
