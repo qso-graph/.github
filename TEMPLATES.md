@@ -28,7 +28,7 @@ single repo, update this file first and propagate.
 
 ### House terms
 
-Use ham-radio words and names as their owners write them: QSO, QSL, ADIF, ADX, Cabrillo, LoTW, TQSL, eQSL, QRZ, POTA, SOTA, IOTA, DXCC, WSJT-X, fldigi, N1MM, MCP, uv, and uvx. Write callsign as one word and use grid square. Use QSO as a noun.
+Use ham-radio words and names as their owners write them: QSO, QSL, ADIF, ADX, Cabrillo, LoTW, TQSL, eQSL, QRZ, POTA, SOTA, IOTA, DXCC, WSJT-X, fldigi, N1MM, MCP, uv, and uvx. Write callsign as one word and use grid square. Use QSO as a noun. American spelling is checked by the `QSOGraph.AmericanSpelling` rule. The heading **Security — Our #1 Priority** is written as on the organization profile, with spaces around the dash, so its links match; mark it for Vale with `<!-- vale Google.EmDash = NO -->` before and `<!-- vale Google.EmDash = YES -->` after.
 
 ## How we develop and release (every qso-graph repo)
 
