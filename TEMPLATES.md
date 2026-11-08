@@ -14,7 +14,7 @@ single repo, update this file first and propagate.
 ## What every public repository carries
 
 - **Site:** Public, non-archived repositories are on qso-graph.io; private and archived repositories never are.
-- **Topics:** Each repository has `qso-graph` and exactly one of `qso-graph-app`, `qso-graph-mcp`, `qso-graph-library`, `qso-graph-tool`, or `qso-graph-infra`; other topics are free.
+- **Topics:** Each repository has `qso-graph` and at least one section: `qso-graph-app`, `qso-graph-mcp`, `qso-graph-library`, `qso-graph-tool`, or `qso-graph-infra` (which is never combined with another). A repository that is more than one thing carries each (QG Trust is an application and a library); its page lives under the first in the order Applications, MCP Servers, Libraries, Tools, and the other sections link to it. Other topics are free.
 - **Sections:** Applications are qso-graph-desktop and qso-graph-trust; MCP servers are `qso-graph-mcp`; libraries are qso-graph-auth and qso-graph-lib; tools are qso-graph-sim, qsp-client, and qso-graph-sdk.
 - **Infrastructure:** homebrew-tap, qso-graph-desktop-updates, qso-graph-packages, qso-graph.github.io, .github, and demo repositories are `qso-graph-infra` and never shown as products.
 - **Metadata:** Each repository has a description and a GPL-3.0 `LICENSE`; repositories with a GitHub Release have a `CHANGELOG.md`.
