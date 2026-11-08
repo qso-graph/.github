@@ -16,7 +16,9 @@ class RulesTest(unittest.TestCase):
     def test_topics(self):
         self.assertTrue(c.topics_ok("qso-graph-desktop", ["qso-graph", "qso-graph-app", "radio"]))
         self.assertFalse(c.topics_ok("qso-graph-desktop", ["qso-graph", "qso-graph-mcp"]))
-        self.assertFalse(c.topics_ok("solar-mcp", ["qso-graph", "qso-graph-mcp", "qso-graph-tool"]))
+        self.assertTrue(c.topics_ok("qso-graph-trust", ["qso-graph", "qso-graph-app", "qso-graph-library"]))
+        self.assertFalse(c.topics_ok("solar-mcp", ["qso-graph"]))
+        self.assertFalse(c.topics_ok("homebrew-tap", ["qso-graph", "qso-graph-infra", "qso-graph-tool"]))
         self.assertFalse(c.topics_ok("solar-mcp", ["qso-graph-mcp"]))
         self.assertEqual(c.expected_section("example-demo"), "qso-graph-infra")
 

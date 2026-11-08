@@ -68,7 +68,11 @@ def expected_section(name: str) -> str | None:
 def topics_ok(name: str, topics: list[str]) -> bool:
     sections = SECTIONS.intersection(topics)
     expected = expected_section(name)
-    return "qso-graph" in topics and len(sections) == 1 and (expected is None or expected in sections)
+    # At least one section; a repository can be more than one thing (QG Trust is an application and a
+    # library). Infrastructure is never also a product.
+    if "qso-graph-infra" in sections and len(sections) > 1:
+        return False
+    return "qso-graph" in topics and len(sections) >= 1 and (expected is None or expected in sections)
 
 
 def docs_ok(paths: set[str]) -> bool:
