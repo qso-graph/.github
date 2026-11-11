@@ -579,6 +579,81 @@ workflow rather than designing its own.
   metadata, so an index never names a file that isn't there yet.
 - The first implementation is [qso-graph-desktop#113](https://github.com/qso-graph/qso-graph-desktop/issues/113).
 
+## Rust crates
+
+Every QSO Graph Rust library (`qso-graph-trust`, `qso-graph-udp`, and those to come) follows these rules.
+Names, package roles and the register of exceptions are governed in the QSO Graph specification,
+`qso-graph-spec`, `FAMILY.md`; this section is how a crate is built, checked and published. **Security is why
+the libraries are Rust**: they parse untrusted input, hold keys or control hardware, and memory safety comes
+first (`qso-graph-spec`, `PILLARS.md` P9). These rules apply to a library from its next release; until then
+its gaps are recorded as exceptions in FAMILY's register. The Python release steps above (`publish.yml`, the
+`pypi` environment) are for Python packages; a Rust library releases with `release.yml` and a `crates-io`
+environment, as below.
+
+### Unsafe code
+
+- **Every crate forbids `unsafe` code**: `unsafe_code = "forbid"` in `[workspace.lints.rust]`, and every member
+  that is not a boundary package inherits it with `[lints] workspace = true`. The exception is a
+  **boundary package** listed in FAMILY's register, and only for its boundary: calling a native library, or
+  exporting a C ABI. A package's role or suffix does not grant the exception; the register does.
+- A boundary package does not inherit the workspace's `forbid`, which cannot be lifted. It sets
+  `unsafe_code = "deny"` and `unsafe_op_in_unsafe_fn = "deny"`, sets Clippy's `undocumented_unsafe_blocks` and
+  `multiple_unsafe_ops_per_block` to `deny` (both default to allow), and allows each unsafe construct individually (a block, an `unsafe fn`, an
+  `unsafe impl`, an `#[unsafe(no_mangle)]` export) with its `SAFETY` reason. QG Trust's `qso-graph-trust-awslc`
+  is the reference.
+- **Generated bindings** (napi-rs, which QSO Graph Desktop's Rust packages use) carry the generator's own
+  allowances; the boundary package then sets `unsafe_code = "deny"` at its crate root, writes no `unsafe` of its
+  own outside the generated code, and says so where it sets the lint.
+- **The policy check proves containment with a planted case**: an `unsafe` block added to any other package
+  must fail it. (QG Trust runs this as `cargo xtask canary`, beside `cargo xtask policy`.)
+- Dependencies may contain `unsafe` code; the supply-chain checks below cover them.
+
+### Dependencies
+
+- **A library declares compatible version requirements** (`serde = "1.0.229"`, not `"=1.0.229"`), so that
+  several QSO Graph libraries can be used together in one program.
+- **Official builds are locked**: `Cargo.lock` is committed, and CI builds with `--locked`.
+- **An exact pin is an exception**, recorded in FAMILY's register with its reason (QG Trust pins exactly in its
+  key-handling and signing path).
+
+### Shared checks
+
+Every Rust library's CI runs these, and `ci-all-green` requires them:
+
+| Check | Command |
+|---|---|
+| Format and lint | `cargo fmt --check`; `cargo clippy --workspace --all-targets --all-features --locked -- -D warnings` |
+| Tests | `cargo test --workspace --all-features --locked` |
+| MSRV | a build with the toolchain named exactly by the declared `rust-version` |
+| Policy | the repository's policy check and its unsafe-containment planted case (QG Trust: `cargo xtask policy`, `cargo xtask canary`) |
+| Supply chain | `cargo deny check`, `cargo vet`, `cargo audit` |
+| Fuzzing | a fuzz target for every parser of untrusted input, run as a smoke test in CI |
+| API compatibility | `cargo semver-checks` against the last published release, from the second release on (a first release has nothing to compare against) |
+
+**A check that is skipped is not passed.** A repository that cannot yet run one lists it in its
+`CONTRIBUTING.md` with the reason, and FAMILY's register records it as an exception.
+
+### Metadata
+
+Every published crate declares `description`, `repository`, `license` (GPL-3.0-or-later, as above), `readme`
+and `rust-version`. Its `keywords` (at most five, Cargo's limit) include `ham-radio` or `amateur-radio`; its
+`categories` come from crates.io's list. Its README lists only what the release supports.
+
+### Publishing
+
+- **A release is a deliberate act**, as every QSO Graph release is (above).
+- **Trusted publishing** from GitHub Actions. A crate's **first** publish needs an API token, because crates.io
+  requires the crate to exist before trusted publishing can be configured. Once trusted publishing is on,
+  revoke the token on crates.io, delete the repository secret that held it, and turn on crates.io's setting
+  that accepts only trusted publishing.
+- **Owners:** the family's GitHub team is an owner, and at least two named people own each crate, because a
+  team cannot add or remove owners. Publishing itself is done by the release workflow, and only KI7MT starts a
+  release.
+- **Complete or resumable.** The published source is the tested tree; every crate in the release publishes, or
+  the release resumes where it stopped; the tag is created once every crate is published, and the GitHub
+  Release follows the tag. QG Trust's `release.yml` is the reference.
+- **Publish a name when there is something working to publish**, never as an empty placeholder.
+
 ## Signing: the same identities for every binary
 
 Every QSO Graph binary on every platform is signed with the same identities: Gregory Beam through the one Azure Artifact Signing account on Windows, Greg Beam's Developer ID
