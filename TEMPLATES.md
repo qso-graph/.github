@@ -646,9 +646,12 @@ and `rust-version`. Its `keywords` (at most five, Cargo's limit) include `ham-ra
   requires the crate to exist before trusted publishing can be configured. Once trusted publishing is on,
   revoke the token on crates.io, delete the repository secret that held it, and turn on crates.io's setting
   that accepts only trusted publishing.
-- **Owners:** the family's GitHub team is an owner, and at least two named people own each crate, because a
-  team cannot add or remove owners. Publishing itself is done by the release workflow, and only KI7MT starts a
-  release.
+- **Owner: KI7MT, and only KI7MT.** Every QSO Graph crate has one owner on crates.io: KI7MT's own account.
+  No team and no agent is an owner; a published crate and its name are permanent, so the person accountable
+  for them holds them. Publishing is done by the release workflow through trusted publishing, which needs no
+  owner's token, and only KI7MT starts a release. **Recovery:** if KI7MT's account is ever unavailable,
+  ownership passes through crates.io's own ownership-transfer process, on the authority recorded in the QSO
+  Graph specification's governance.
 - **Complete or resumable.** The published source is the tested tree; every crate in the release publishes, or
   the release resumes where it stopped; the tag is created once every crate is published, and the GitHub
   Release follows the tag. QG Trust's `release.yml` is the reference.
