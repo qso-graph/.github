@@ -684,8 +684,11 @@ Azure administrator; the rest go in the repository's own pull request.
 3. **Environments** in the repository, each restricted to `main`: `windows-signing` holding
    `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`; `macos-signing` (empty: the Apple
    secrets come from the organization); `crates-io` for a Rust repo.
-4. **Release workflow** calls `sign-windows.yml` with no secrets and `sign-macos.yml` with the six Apple
-   secrets by name, both pinned to a full commit SHA of this repository. QG Interop's
+4. **Release workflow** passes the secrets by name, never `secrets: inherit`: the three Azure IDs to
+   `sign-windows.yml` and the six Apple secrets to `sign-macos.yml`, through every workflow between
+   (GitHub passes a secret only to the workflow called directly). Both pinned to a full commit SHA of
+   this repository. The Azure values are read from the `windows-signing` Environment even though they
+   are passed: GitHub requires the pass, and the Environment's value takes precedence. QG Interop's
    `.github/workflows/binaries.yml` is the reference caller.
 5. **Linux packages**: one line in `qso-graph-packages/products.tsv`.
 6. **Dry run** the release from `main` before the first real one; the signing jobs prove steps 1–3.
