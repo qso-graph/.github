@@ -9,7 +9,7 @@ name: Sign for Windows
 #     needs: build
 #     uses: qso-graph/.github/.github/workflows/sign-windows.yml@<commit>
 #     with: { artifact: qgt-windows-unsigned, signed: qgt-windows }
-#     (no secrets: the Azure IDs are read from the caller's windows-signing Environment)
+#     secrets: { AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}, ... }   # the three, by name
 #
 # The caller's windows-signing Environment holds the three Azure IDs, and Azure
 # trusts GitHub's own token for that Environment of that repository alone, so no
@@ -27,6 +27,13 @@ on:
         description: The artifact name to upload the signed files under
         type: string
         required: true
+    # GitHub hands an Environment secret to a called workflow's job only when the caller
+    # passes it, by name or inherited, even though the value read is the Environment's
+    # (it takes precedence). Declared here so a caller can pass the three by name.
+    secrets:
+      AZURE_CLIENT_ID: { required: false }
+      AZURE_TENANT_ID: { required: false }
+      AZURE_SUBSCRIPTION_ID: { required: false }
 
 permissions:
   contents: read
