@@ -9,7 +9,7 @@ name: Sign for macOS
 #     needs: build
 #     uses: qso-graph/.github/.github/workflows/sign-macos.yml@<commit>
 #     with: { artifact: qgt-macos-unsigned, signed: qgt-macos }
-#     secrets: inherit
+#     secrets: { CSC_LINK: ${{ secrets.CSC_LINK }}, ... }   # the six, by name
 #
 # The caller's macos-signing Environment holds the certificate (CSC_LINK,
 # CSC_KEY_PASSWORD) and the notary key (APPLE_API_KEY_P8, APPLE_API_KEY_ID,
@@ -30,6 +30,17 @@ on:
         description: The artifact name to upload the signed files under
         type: string
         required: true
+    # QSO Graph's Apple secrets are organization secrets, which reach a called
+    # workflow only when the caller passes them by name; declared here so it can.
+    # The caller's macos-signing Environment can hold them instead; either way the
+    # step below refuses an empty one.
+    secrets:
+      CSC_LINK: { required: false }
+      CSC_KEY_PASSWORD: { required: false }
+      APPLE_API_KEY_P8: { required: false }
+      APPLE_API_KEY_ID: { required: false }
+      APPLE_API_ISSUER: { required: false }
+      APPLE_TEAM_ID: { required: false }
 
 permissions:
   contents: read
