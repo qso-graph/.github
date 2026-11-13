@@ -663,11 +663,32 @@ libraries, QG Rig and QG UDP) are signed by shared workflows here, called from e
 | Workflow | Does | Needs, in the calling repo |
 |---|---|---|
 | `sign-windows.yml` | Signs every `.exe` and `.dll`, then checks each is Valid and signed by CN=Gregory Beam | a `windows-signing` Environment (branch rule: main) with `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, and Azure trusting that Environment |
-| `sign-macos.yml` | Signs every Mach-O file with the hardened runtime and a timestamp, notarizes them, checks each signature | a `macos-signing` Environment (branch rule: main) with `CSC_LINK`, `CSC_KEY_PASSWORD`, `APPLE_API_KEY_P8`, `APPLE_API_KEY_ID`, `APPLE_API_ISSUER`, `APPLE_TEAM_ID` |
+| `sign-macos.yml` | Signs every Mach-O file with the hardened runtime and a timestamp, notarizes them, checks each signature | a `macos-signing` Environment (branch rule: main), and the six Apple organization secrets `CSC_LINK`, `CSC_KEY_PASSWORD`, `APPLE_API_KEY_P8`, `APPLE_API_KEY_ID`, `APPLE_API_ISSUER`, `APPLE_TEAM_ID` visible to the repo and passed by name (never `secrets: inherit`) |
 | `release-attest.yml` | Gathers the signed files, writes `SHA256SUMS.txt`, attests every file | nothing |
 
 The secret names are QSO Graph Desktop's, so its Environments show what goes where. Electron apps keep
 electron-builder's signing inside the build (above), with the same Environments.
+
+### A new repository that signs: one-time setup
+
+Do these once per repository, before its first signed release. Steps 1 and 2 need an organization or
+Azure administrator; the rest go in the repository's own pull request.
+
+1. **Windows (Azure).** On the Entra app `qso-graph-desktop-ci`, add a federated credential named
+   `<repo>-windows-signing`: issuer `https://token.actions.githubusercontent.com`, audience
+   `api://AzureADTokenExchange`, subject in GitHub's immutable form
+   `repo:qso-graph@265651030/<repo>@<repo-id>:environment:windows-signing`. The repo ID is
+   `gh api repos/qso-graph/<repo> --jq .id`. The app allows 20 federated credentials.
+2. **macOS (Apple).** Add the repository to the selected repositories of each of the six Apple
+   organization secrets (Organization settings → Secrets and variables → Actions).
+3. **Environments** in the repository, each restricted to `main`: `windows-signing` holding
+   `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`; `macos-signing` (empty: the Apple
+   secrets come from the organization); `crates-io` for a Rust repo.
+4. **Release workflow** calls `sign-windows.yml` with no secrets and `sign-macos.yml` with the six Apple
+   secrets by name, both pinned to a full commit SHA of this repository. QG Interop's
+   `.github/workflows/binaries.yml` is the reference caller.
+5. **Linux packages**: one line in `qso-graph-packages/products.tsv`.
+6. **Dry run** the release from `main` before the first real one; the signing jobs prove steps 1–3.
 
 **Shared, and still isolated.** The note at the end of this file prefers a copy in each repo for publishing,
 because a change to a shared workflow would reach every repo at once. These are called pinned to a commit
