@@ -9,7 +9,7 @@ name: Sign for Windows
 #     needs: build
 #     uses: qso-graph/.github/.github/workflows/sign-windows.yml@<commit>
 #     with: { artifact: qgt-windows-unsigned, signed: qgt-windows }
-#     secrets: inherit
+#     (no secrets: the Azure IDs are read from the caller's windows-signing Environment)
 #
 # The caller's windows-signing Environment holds the three Azure IDs, and Azure
 # trusts GitHub's own token for that Environment of that repository alone, so no
