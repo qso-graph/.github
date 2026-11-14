@@ -141,13 +141,13 @@ gets you a version number and nothing else.
 | Package | Planned | Status |
 |:--------|:--------|:-------|
 | [dxe-mcp](https://github.com/qso-graph/dxe-mcp) | DXpedition tracking | In development — no working tools |
-| [js8call-mcp](https://github.com/qso-graph/js8call-mcp) | JS8Call HF messaging | In development — no working tools |
 | [qso-graph-contest-mcp](https://github.com/qso-graph/qso-graph-contest-mcp) | Contest calendar and rules | In development — no working tools |
 
 #### Radio Logging
 
 | Package | Service | Tools | Status |
 |:--------|:--------|:------|:-------|
+| [jt-mcp](https://github.com/qso-graph/jt-mcp) | [WSJT-X](https://wsjt.sourceforge.io/wsjtx.html) | 7 tools: status, CQ, decodes, stations heard, WSPR spots, diagnostics, version info | [![PyPI](https://img.shields.io/pypi/v/jt-mcp?label=PyPI&color=blue)](https://pypi.org/project/jt-mcp/) |
 | [n1mm-mcp](https://github.com/qso-graph/n1mm-mcp) | [N1MM Logger+](https://n1mm.hamdocs.com/) | 12 tools: station state, lookup, contacts, bandmap, performance, multipliers, clock, network, pileup, SO2R, diagnostics, version info | [![PyPI](https://img.shields.io/pypi/v/n1mm-mcp?label=PyPI&color=blue)](https://pypi.org/project/n1mm-mcp/) |
 | [netlogger-mcp](https://github.com/qso-graph/netlogger-mcp) | [NetLogger](https://www.netlogger.org/) | 6 tools: active nets, live check-ins and who's up, past nets, past check-ins, set callsign, version info | [![PyPI](https://img.shields.io/pypi/v/netlogger-mcp?label=PyPI&color=blue)](https://pypi.org/project/netlogger-mcp/) |
 
