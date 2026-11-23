@@ -25,7 +25,7 @@ single repo, update this file first and propagate.
 - **Releases:** The site shows each product at its latest GitHub Release, so updating its documentation requires a release.
 - **Installation:** Python packages are installed and run with uv, never `pip install` in a README; use `uvx`, `uv add`, or `uv tool install` as appropriate (see [the uv section](#uv-how-every-qso-graph-repo-is-installed-run-and-developed)). Native apps describe their own installers.
 - **Security reports:** private vulnerability reporting is on, since `SECURITY.md` sends reporters there.
-- **Community files:** Issue templates, the pull request template, `SECURITY.md`, and `CONTRIBUTING.md` inherit this repository's defaults unless a repository needs its own; a repository's own versions keep the core headings (bug: Observed, Reproduce, Credentials; feature: Summary, Credentials; pull request: Issues, What changed, Verification, Credentials) and may add fields of their own.
+- **Community files:** Issue templates, the pull request template, `SECURITY.md`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md` inherit this repository's defaults unless a repository needs its own; a repository's own versions keep the core headings (bug: Observed, Reproduce, Credentials; feature: Summary, Credentials; pull request: Issues, What changed, Verification, Credentials) and may add fields of their own.
 
 ### House terms
 
