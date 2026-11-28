@@ -7,7 +7,7 @@
 - Report security vulnerabilities through private vulnerability reporting, never in a public issue.
 - Keep one open pull request per repository, targeting `main`; the next change waits for it or joins it.
 - Use the pull request template headings: Issues, What changed, Verification, and Credentials.
-- Add each change under `## [Unreleased]` in `CHANGELOG.md`.
+- Record each change for the release notes: under `## [Unreleased]` in `CHANGELOG.md`, or, where a repository generates its notes with cocogitto, in a Conventional Commit.
 - Bump versions only in a release pull request; merging publishes nothing, and release is a separate step.
 - Install, run, and develop Python with uv (`uvx`, `uv tool install`, `uv add`, `uv run`); documentation never tells users to use pip.
 - Make `README.md` the product page: what it is, who it is for, what it does, installation, and first use.
